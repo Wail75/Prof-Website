@@ -1,0 +1,33 @@
+%# required variables: $selected_quiz_name $item_id $question
+%# expects flash or session variable 'response_msg' to show if the response to quiz is correct or not
+
+% if (my $msg = flash('response_msg') || stash('response_msg')) {
+<p id='response-result' style="color: <%= $msg =~ /Good/i ? 'green' : 'red' %>"><%=l($msg)%></p>
+% }
+
+% if ($selected_quiz_name) {
+
+<h1 id="quiz-name"><%=l('Quiz: ') . $selected_quiz_name%></h1>
+
+    % if ($item_id) {
+
+<p id='question-asked'><%=l('Question:') . ' '%><b id="question"><%=$question%></b></p>
+<h2><%=l('Your answer')%></h2>
+<p>
+%= form_for 'respond_question', style => "display: inline;" => begin
+    %= csrf_field
+    %= hidden_field item_id => $item_id
+    %= text_field 'response', style => "font-size:170%;line-height:2.5em;", autofocus => '', autocomplete => 'off'
+    %= submit_button l('Send')
+%= end
+</p>
+
+    % } else {
+
+<p><%=l('No item for this quiz.')%></p>
+
+    % }
+
+% } else {
+<h1><%=l('No quiz found.')%></h1>
+% }

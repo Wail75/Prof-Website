@@ -1,0 +1,8 @@
+<%=l('Hello from Blank Website.')%>
+
+<%=l('You have just asked to change your account email address.')%>
+<%=l('Please confirm that you received this email by visiting this link')%> <%= $url %> .
+
+<%=l('If you have not tried to change your email address, please tell us.')%>
+
+<%=l('The Blank Website team')%>

@@ -1,0 +1,8 @@
+% layout 'default';
+% title l($selected_quiz_name || 'Quiz not found.');
+
+%= include 'common/_notifications'
+
+%= include 'common/_connected_top_bar'
+
+%= include 'common/_do_quiz'

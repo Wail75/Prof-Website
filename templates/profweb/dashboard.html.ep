@@ -1,0 +1,21 @@
+% layout 'default';
+% title l('Dashboard');
+
+%= include 'common/_notifications'
+
+%= include 'common/_connected_top_bar'
+
+<h1 id="author"><%= link_to author_index => begin %><%=l('Quiz Authoring')%><%end%></h1>
+<%= link_to author_index => begin %><%=l('Click here to create and edit quizzes.')%><%end%>
+
+%= include 'common/_do_quiz'
+
+% if ($quizs) {
+    %= form_for 'dashboard', method => 'POST' => begin
+        %= csrf_field
+        %= label_for selected_quiz => l('Select the quiz you want to do')
+        %# prepare a list of selection options quiz_name => quiz id, with the session selected quiz if any
+        %= select_field selected_quiz => [map {[$_->{name} => $_->{id}, ( $selected_quiz_name && $selected_quiz_name eq $_->{name} ? ('selected' => '') : ()) ]} @$quizs], id => 'selected_quiz'
+        %= submit_button l('Select')
+    %= end
+% }

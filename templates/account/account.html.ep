@@ -1,0 +1,114 @@
+% layout 'default';
+% title l('User Account');
+
+%= include 'common/_notifications'
+
+%= include 'common/_connected_top_bar'
+
+<h1><%=l('Account Management')%></h1>
+
+<div id="name-control">
+% if ( $email && $name && $name eq $email ) {
+<p id="name-notif"><%=l('You have not given a name for your account so we are calling you by your email address.')%></p>
+% }
+%= form_for modify_user_name => begin
+    %= csrf_field
+    <%= hidden_field 'user-id' => $id %>
+    <p id="name-change">
+    <%=l('You can give a new account name here: ')%>
+% my $name_change_errors = flash('name_change_errors') || {};
+% if ( my $e = $name_change_errors->{'new-name'} ) {
+    <b id="error-new-name" class="error">
+    %= l('You must give a new name.') if $e->[0] eq 'required'
+    %= l("Name must be at least $V::V_MIN_NAME characters.") if $e->[0] eq 'min'
+    %= l("Name must be at maximum $V::V_MAX_NAME characters.") if $e->[0] eq 'max'
+    %= l('The new name must be different from the current name.') if $e->[0] eq 'original'
+    </b>
+% }
+    <%= text_field 'new-name' => flash('prev_name_change_new-name') %>
+    <%= submit_button l('Save the new name') %>
+    </p>
+% end
+</div>
+
+<div id="email-control">
+
+<p id="email-notif">
+% if ( ! $email ) {
+    <%=l('You have not given an email address yet.')%> <%=l('Consider giving one so that we can send you relevant messages and let you recover your account.')%>
+% } else {
+    <%=l('Your email address is')%> <%= $email %>.
+% }
+</p>
+
+%= form_for ask_email_change => begin
+    %= csrf_field
+<p id="email-change">
+    <%=l('You can give a new account email here: ')%>
+% my $ask_email_change_errors = flash('ask_email_change_errors') || {};
+% if ( my $e = $ask_email_change_errors->{'new-email'} ) {
+    <b id="error-new-email" class="error">
+    %= l('You must give a new email.') if $e->[0] eq 'required'
+    %= l("Email address must be at least $V::V_MIN_EMAIL characters.") if $e->[0] eq 'min'
+    %= l("Email address must be at maximum $V::V_MAX_EMAIL characters.") if $e->[0] eq 'max'
+    %= l('The new email must be different from the current email.') if $e->[0] eq 'original'
+    %= l('The syntax of the new email is not valid.') if $e->[0] eq 'email_syntax'
+    </b>
+% }
+    <%= email_field 'new-email' => flash('prev_ask_email_change_new-email') %>
+    <%= submit_button l('Save the new email') %>
+</p>
+% end
+
+</div>
+
+<div id="password-control">
+
+%= form_for modify_user_password => begin
+    %= csrf_field
+    <p id="password-change">
+    % my $password_change_errors = flash('password_change_errors') || {};
+    %= label_for 'new-pwd1' => begin
+        <%=l('You can give a new password here: ')%>
+        % if ( my $e = $password_change_errors->{'new-pwd1'} ) {
+        <b id="error-new-pwd1" class="error">
+            %= l('You must give a new password.') if $e->[0] eq 'required'
+            %= l("Password must be at least $V::V_MIN_PWD characters.") if $e->[0] eq 'min'
+            %= l("Password must be at maximum $V::V_MAX_PWD characters.") if $e->[0] eq 'max'
+            %= l('The new password is invalid.') if $e->[0] eq 'pwd_syntax'
+            %= l('The new password must be different from the current password.') if $e->[0] eq 'diff_than'
+        </b>
+        % }
+    % end
+    <%= password_field 'new-pwd1' %>
+
+    <%=l('Repeat the new password here: ')%>
+    % if ( my $e = $password_change_errors->{'new-pwd2'} ) {
+    <b id="error-new-pwd2" class="error">
+    %= l('You must repeat the new password for confirmation.') if $e->[0] eq 'required'
+    %= l('Password and confirmation password must be the same.') if $e->[0] eq 'equal_to'
+    </b>
+    % }
+    <%= password_field 'new-pwd2' %>
+
+    <%=l('Give your current password: ')%>
+    % if ( my $e = $password_change_errors->{'current-pwd'} ) {
+    <b id="error-current-pwd" class="error">
+    %= l('You must give the current password.') if $e->[0] eq 'required'
+    %= l('Wrong password.') if $e->[0] eq 'correct'
+    </b>
+    % }
+    <%= password_field 'current-pwd' %>
+
+    <%= submit_button l('Save the new password') %>
+</p>
+% end
+
+<p id="email-verif">
+% if ( $email && $email_verified eq 'no' ) {
+    <%=l('Your email address is not verified yet.')%> <%=l('Check your email inbox and your spams.')%> <%=l('Once you have the verification email, click the link inside it to verify your email address.')%>
+    <%=l('To send the verification email again, click on this link')%>
+% }
+</p>
+
+</div>

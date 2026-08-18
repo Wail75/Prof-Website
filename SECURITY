@@ -1,0 +1,6 @@
+# Email API
+
+Set an expiration date for the API tokens, 3 months.
+
+# Secrets
+Watch out for the secrets for Mojolicious and for JWT.

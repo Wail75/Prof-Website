@@ -1,0 +1,6 @@
+- clone the podman-blank project https://gitea.com/Wail_Y/Podman-Blank
+- this website can work without root, if necessary, redirect the 80/443 ports to another port
+- adapt it to Prof (by replacing the work blank/Blank by your new project name)
+- copy and adapt the blank.conf (to profweb.conf)
+- generate TLS certificates and keys and point to them from the Mojolicious container
+- prepare the domain name with emails for sending messages and adapt the configuration file

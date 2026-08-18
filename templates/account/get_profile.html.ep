@@ -1,0 +1,41 @@
+% layout 'default';
+% title $profile_name ? (l('Profile: ') . $profile_name) : l('Profile');
+
+%= include 'common/_notifications'
+
+%= include 'common/_connected_top_bar'
+
+% if ($profile_name) {
+
+<h1><%=l('Profile: ') . $profile_name%></h1>
+
+% }
+
+% if (session('id') && $profile_id && session('id') eq $profile_id) {
+<p id="profile-tutorial">
+<%=l 'This is your Profile page.' %> <%=l 'By default, it is private.' %> <%=l 'But if you add a description, it will become public.' %>
+</p>
+
+% my $profile_change_errors = flash('profile_change_errors') || {};
+%= form_for modify_profile => begin
+    %= csrf_field
+<p id="profile-description-change">
+    %= label_for 'description' => begin
+        <%=l 'You can view or change your profile here:' %>
+        % if ( my $e = $profile_change_errors->{'description'} ) {
+        <b id="error-description" class="error">
+            %= l('You must give a new description, even if empty.') if $e->[0] eq 'required'
+            %= l('The new profile description is too long.') if $e->[0] eq 'max'
+        </b>
+        % }
+    % end
+    <%= text_area 'description' => $profile_desc => (id => 'modify-description') %>
+    <%= submit_button l('Send') %>
+</p>
+% end
+
+% } elsif ($profile_desc) {
+
+<p id='description'><%= $profile_desc %></p>
+
+% }

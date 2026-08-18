@@ -1,0 +1,8 @@
+Hello from Blank Website.
+
+You have just registered an account for this email address.
+Please confirm that you received this email by visiting this link <%= $url %> .
+
+If you have not tried to register to the Blank Website, please tell us.
+
+The Blank Website team

@@ -1,0 +1,37 @@
+Install Perl (consider Perlbrew), cpan/cpanm and the Perl module Carton
+
+# might help for installing Perl modules
+apt install build-essential
+
+# for (unblock some missing thing)
+apt install libmojolicious-perl
+# for IO::Socket::SSL and Net::SSLeay (zlib1g-dev maybe unnecessary on some platforms)
+apt install libssl-dev zlib1g-dev
+# optional, to generate secrets
+apt install apg
+
+# Postgresql 16
+# NOTE use the same Postgresql version, find older Pg versions with Pg repos
+sudo apt install postgresql-16 postgresql-client postgresql-server-dev-all
+adduser devpg
+su - postgres / sudo -i -u postgres
+createuser --pwprompt devpg
+createdb -O devpg profweb TEST-profweb
+# DON'T FORGET to run the migrations later (see below)
+
+carton install
+
+# Email provider
+check that emails can be send to the API with curl for example, check that the host TLS works
+
+# configuration file
+add the secrets for the Mojolicious app
+add the database access ids
+add the email API provider ids
+
+# Run the migrations later
+carton exec "./script/profweb.pl eval 'app->pg->migrations->migrate()'"
+
+# Dump and restore to migrate
+pg_dump -U devpg --data-only -Fc profweb > profweb.dump
+su -l - devpg -c "pg_restore -d profweb /home/devpg/profweb.dump"
