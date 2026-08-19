@@ -1,0 +1,8 @@
+# Before release
+
+- update lib/$(Project).pm and Changes
+- make perltidy
+- make readme
+- make test
+- git commit and push
+- git tag and push
