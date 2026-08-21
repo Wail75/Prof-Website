@@ -1,8 +1,8 @@
 # Before release
 
 - update lib/$(Project).pm and Changes
-- make perltidy
-- make readme
-- make test
+- make perltidy (no change should happen)
+- make readme (no change should happen)
+- make test (no error should happen)
 - git commit and push
 - git tag and push
