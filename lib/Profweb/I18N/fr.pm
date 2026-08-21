@@ -254,7 +254,8 @@ our %Lexicon = (
   'Make it public'                                              => "Le rendre public",
   'Quiz updated.'                                               => "Quiz mis à jour.",
   'Quiz update failed.'                                         => "Échec de la mise à jour du quiz.",
-  'Quiz not found.'                                             => "Aucun quiz trouvé.",
+  'Quiz not found.'                                             => "Le quiz n'a pas été trouvé.",
+  'No quiz found.'                                              => "Aucun quiz trouvé.",
   'To get more questions, please create an account and log in.' =>
     "Pour avoir plus de questions, veuillez créer un compte utilisateur et vous connecter.",
   'Direct link to this quiz.' => "Lien direct vers ce quiz."
