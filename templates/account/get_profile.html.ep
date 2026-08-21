@@ -1,7 +1,7 @@
 % layout 'default';
-% title $profile_name ? (l('Profile: ') . $profile_name) : l('Profile');
+% title $profile_name ? l('Profile: ') . $profile_name : l('Profile');
 
-%= include 'common/_notifications'
+<div class="container">
 
 %= include 'common/_connected_top_bar'
 
@@ -10,6 +10,8 @@
 <h1><%=l('Profile: ') . $profile_name%></h1>
 
 % }
+
+%= include 'common/_notifications'
 
 % if (session('id') && $profile_id && session('id') eq $profile_id) {
 <p id="profile-tutorial">
@@ -20,6 +22,7 @@
 %= form_for modify_profile => begin
     %= csrf_field
 <p id="profile-description-change">
+    <p>
     %= label_for 'description' => begin
         <%=l 'You can view or change your profile here:' %>
         % if ( my $e = $profile_change_errors->{'description'} ) {
@@ -29,8 +32,13 @@
         </b>
         % }
     % end
+    </p>
+    <p>
     <%= text_area 'description' => $profile_desc => (id => 'modify-description') %>
+    </p>
+    <p>
     <%= submit_button l('Send') %>
+    </p>
 </p>
 % end
 
@@ -39,3 +47,5 @@
 <p id='description'><%= $profile_desc %></p>
 
 % }
+
+</div>

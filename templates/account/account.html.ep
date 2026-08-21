@@ -1,11 +1,13 @@
 % layout 'default';
 % title l('User Account');
 
-%= include 'common/_notifications'
+<div class="container">
 
 %= include 'common/_connected_top_bar'
 
 <h1><%=l('Account Management')%></h1>
+
+%= include 'common/_notifications'
 
 <div id="name-control">
 % if ( $email && $name && $name eq $email ) {
@@ -110,5 +112,7 @@
     <%=l('To send the verification email again, click on this link')%>
 % }
 </p>
+
+</div>
 
 </div>

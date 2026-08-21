@@ -424,7 +424,9 @@ subtest 'Recover password' => sub {
     ->text_like('b#notif-error' => qr/You can not do that/)
     ->text_is('b#notif-ok' => undef);
 
-  $t->get_ok($recover_password)->status_is(200)->text_like('p', qr/Enter your email address .* reset your password/);
+  $t->get_ok($recover_password)
+    ->status_is(200)
+    ->text_like('p#explain', qr/Enter your email address .* reset your password/);
 
   $t->post_ok($recover_password => form => {})
     ->status_is(200)

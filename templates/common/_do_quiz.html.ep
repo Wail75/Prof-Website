@@ -7,12 +7,12 @@
 
 % if ($selected_quiz_name) {
 
-<h1 id="quiz-name"><%=l('Quiz: ') . $selected_quiz_name%></h1>
+<h3 id="quiz-name"><%=l('Quiz: ') . $selected_quiz_name%></h3>
 
     % if ($item_id) {
 
 <p id='question-asked'><%=l('Question:') . ' '%><b id="question"><%=$question%></b></p>
-<h2><%=l('Your answer')%></h2>
+<p><%=l('Your answer')%></p>
 <p>
 %= form_for 'respond_question', style => "display: inline;" => begin
     %= csrf_field
@@ -29,5 +29,5 @@
     % }
 
 % } else {
-<h1><%=l('No quiz found.')%></h1>
+<h3><%=l('No quiz found.')%></h3>
 % }
