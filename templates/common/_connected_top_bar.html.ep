@@ -1,12 +1,12 @@
-<div id="top-bar">
-<p id="account-name">
-%= link_to l('Index') => 'index'
-% if (session 'id') {
-%= link_to l('Dashboard') => 'dashboard'
-%= link_to l('My Account') => 'account'
-%= link_to l('My Profile') => url_for('get_profile', 'user-id' => session('id')) => (id => 'my-profile-link')
-<%=l('Connected:') . ' ' %><%= session 'name' %>.
-%= link_to l('Logout') => 'logout', id => 'logout_link'
-% }
-</p>
+<div id="top-bar" style="margin-top: 05%">
+  <p id="account-name">
+  %= link_to l('Index') => 'index'
+  % if (session 'id') {
+  %= link_to l('Dashboard') => 'dashboard'
+  %= link_to l('My Account') => 'account'
+  %= link_to l('My Profile') => url_for('get_profile', 'user-id' => session('id')) => (id => 'my-profile-link')
+  <%=l('Connected:') . ' ' %><%= session 'name' %>.
+  %= link_to l('Logout') => 'logout', id => 'logout_link'
+  % }
+  </p>
 </div>

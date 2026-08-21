@@ -1,115 +1,128 @@
 % layout 'default';
 % title l('Welcome');
 
+<div class="container">
+
+%= include 'common/_connected_top_bar'
+
 %= include 'common/_notifications'
 
-% if (session 'id') {
+<div class="row">
+  <h1><%=l 'Prof' %></h1>
+  <p><%=l 'Learn and memorize by creating your quizzes and playing them.' %></p>
+  <p><%=l 'I (Waïl Yahyaoui) have designed this website to help learn a new language and its words in particular.' %> <%=l 'You can create a quiz that represents a lesson, each item is a word you want to learn, with its translation in your native language as the question, and the word in the language you are learning as the answer.' %></p>
+  <p><%=l 'You can create quizzes and play them.' %> <%=l 'You can make your quiz public and share it with other people.' %> <%=l 'You can connect to your dashboard and this website will automatically choose a question for you, preferably a question that you have not answered yet or one where you made more mistakes.' %></p>
+  <p><%=l "More features will come later, don't hesitate to give me some feedback." %> <%=l 'I am actively using this website to help me learn!' %></p>
 
-    %= include 'common/_connected_top_bar'
+  % if ( ! session('id') ) {
+  <p><%=l 'Create an account and log in to start your quizzes.' %></p>
+  % }
 
-% } else {
-
-<div>
-<h1><%=l 'Log in' %></h1>
-% if ( my $login_error = flash('login_error')) {
-    <p id="login-error" class="error"><%=l $login_error %></p>
-% }
-<table>
-%= form_for login => begin
-    %= csrf_field
-<tr><td><%=l 'Name' %></td>     <td><%= text_field 'name' %></td> </tr>
-<tr><td><%=l 'Password' %></td> <td><%= password_field 'pwd' %></td></tr>
-<tr><td></td>                   <td><%= submit_button l('Login') %></td></tr>
-% end
-</table>
-<p><%= link_to l('Forgotten password? Click here to recover it.') => 'recover_password_form' %></p>
 </div>
 
-<div>
-<h1><%=l 'Register' %></h1>
-<p>
-    <%=l "You can register with a name only if you don't to give an email address." %>
-    <%=l "However, without an email address, you won't be able to recover your account if you forget your password." %></td>
-    <%=l 'If you give an email address but no name, you will be able to login with your email address.' %></td>
-</p>
-<p><%=l "Password must be between $V::V_MIN_PWD and $V::V_MAX_PWD characters long." %> <%=l 'Password must contain at least one letter and one digit.' %></p>
-<table>
-% my $registration_errors = flash('registration_errors') || {};
-%= form_for register => begin
-    %= csrf_field
-<tr>
-    <td><%=l 'Name' %></td>
-    <td><%= text_field 'name' => flash('prev_registration_name') %>
-% if ( my $e = $registration_errors->{'name'} ) {
-        <p id="error-name" class="error">
-    %= l("Name must be at least $V::V_MIN_NAME characters.") if $e->[0] eq 'min'
-    %= l("Name must be at maximum $V::V_MAX_NAME characters.") if $e->[0] eq 'max'
+% if ( ! session('id') ) {
+
+<div class="row">
+
+    <div class="one-half column">
+        <h2><%=l 'Log in' %></h2>
+        % if ( my $login_error = flash('login_error')) {
+            <p id="login-error" class="error"><%=l $login_error %></p>
+        % }
+        <table>
+            %= form_for login => begin
+                %= csrf_field
+            <tr><td><%=l 'Name' %></td>     <td><%= text_field 'name' %></td> </tr>
+            <tr><td><%=l 'Password' %></td> <td><%= password_field 'pwd' %></td></tr>
+            <tr><td></td>                   <td><%= submit_button l('Login') %></td></tr>
+            % end
+        </table>
+        <p><%= link_to l('Forgotten password? Click here to recover it.') => 'recover_password_form' %></p>
+    </div>
+
+    <div class="one-half column">
+        <h2><%=l 'Register' %></h2>
+
+        <p>
+            <%=l "You can register with a name only if you don't to give an email address." %>
+            <%=l "However, without an email address, you won't be able to recover your account if you forget your password." %></td>
+            <%=l 'If you give an email address but no name, you will be able to login with your email address.' %></td>
         </p>
-% }
-    </td>
-</tr>
-<tr>
-    <td><%=l 'OR' %></td>
-    <td>
-% if ( $registration_errors->{'name&email'} ) {
-        <p id="error-name&email" class="error"><%=l 'You must give a user name or an email or both.' %></p>
-% }
-    </td>
-</tr>
-<tr><td><%=l 'Email' %></td>
-    <td><%= email_field 'email' => flash('prev_registration_email') %>
-% if ( my $e = $registration_errors->{'email'} ) {
-        <p id="error-email" class="error">
-    %= l("Email address must be at least $V::V_MIN_EMAIL characters.") if $e->[0] eq 'min'
-    %= l("Email address must be at maximum $V::V_MAX_EMAIL characters.") if $e->[0] eq 'max'
-    %= l('The syntax of the email is not valid.') if $e->[0] eq 'email_syntax'
-        </p>
-% }
-    </td>
-</tr>
-<tr><td><%=l 'Password' %></td>
-    <td><%= password_field 'pwd1' %>
-% if ( my $e = $registration_errors->{'pwd1'} ) {
-        <p id="error-pwd1" class="error">
-    %= l('You must give a password.') if $e->[0] eq 'required'
-    %= l("Password must be at least $V::V_MIN_PWD characters.") if $e->[0] eq 'min'
-    %= l("Password must be at maximum $V::V_MAX_PWD characters.") if $e->[0] eq 'max'
-    %= l('Please respect the given password syntax.') if $e->[0] eq 'pwd_syntax'
-        </p>
-% }
-    </td>
-</tr>
-<tr><td><%=l 'Repeat password' %></td>
-    <td><%= password_field 'pwd2' %>
-% if ( my $e = $registration_errors->{'pwd2'} ) {
-        <p id="error-pwd2" class="error">
-    %= l('You must give a confirmation password.') if $e->[0] eq 'required'
-    %= l('Password and confirmation password must be the same.') if $e->[0] eq 'equal_to'
-        </p>
-% }
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td><%= submit_button l('Register') %></td>
-</tr>
-% end
-</table>
+        <p><%=l "Password must be between $V::V_MIN_PWD and $V::V_MAX_PWD characters long." %> <%=l 'Password must contain at least one letter and one digit.' %></p>
+
+        <table>
+        % my $registration_errors = flash('registration_errors') || {};
+        %= form_for register => begin
+            %= csrf_field
+            <tr>
+                <td><%=l 'Name' %></td>
+                <td><%= text_field 'name' => flash('prev_registration_name') %>
+            % if ( my $e = $registration_errors->{'name'} ) {
+                    <p id="error-name" class="error">
+                %= l("Name must be at least $V::V_MIN_NAME characters.") if $e->[0] eq 'min'
+                %= l("Name must be at maximum $V::V_MAX_NAME characters.") if $e->[0] eq 'max'
+                    </p>
+            % }
+                </td>
+            </tr>
+            <tr>
+                <td><%=l 'OR' %></td>
+                <td>
+            % if ( $registration_errors->{'name&email'} ) {
+                    <p id="error-name&email" class="error"><%=l 'You must give a user name or an email or both.' %></p>
+            % }
+                </td>
+            </tr>
+            <tr><td><%=l 'Email' %></td>
+                <td><%= email_field 'email' => flash('prev_registration_email') %>
+            % if ( my $e = $registration_errors->{'email'} ) {
+                    <p id="error-email" class="error">
+                %= l("Email address must be at least $V::V_MIN_EMAIL characters.") if $e->[0] eq 'min'
+                %= l("Email address must be at maximum $V::V_MAX_EMAIL characters.") if $e->[0] eq 'max'
+                %= l('The syntax of the email is not valid.') if $e->[0] eq 'email_syntax'
+                    </p>
+            % }
+                </td>
+            </tr>
+            <tr><td><%=l 'Password' %></td>
+                <td><%= password_field 'pwd1' %>
+            % if ( my $e = $registration_errors->{'pwd1'} ) {
+                    <p id="error-pwd1" class="error">
+                %= l('You must give a password.') if $e->[0] eq 'required'
+                %= l("Password must be at least $V::V_MIN_PWD characters.") if $e->[0] eq 'min'
+                %= l("Password must be at maximum $V::V_MAX_PWD characters.") if $e->[0] eq 'max'
+                %= l('Please respect the given password syntax.') if $e->[0] eq 'pwd_syntax'
+                    </p>
+            % }
+                </td>
+            </tr>
+            <tr><td><%=l 'Repeat password' %></td>
+                <td><%= password_field 'pwd2' %>
+            % if ( my $e = $registration_errors->{'pwd2'} ) {
+                    <p id="error-pwd2" class="error">
+                %= l('You must give a confirmation password.') if $e->[0] eq 'required'
+                %= l('Password and confirmation password must be the same.') if $e->[0] eq 'equal_to'
+                    </p>
+            % }
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><%= submit_button l('Register') %></td>
+            </tr>
+        % end
+        </table>
+
+    </div>
+
 </div>
 
 % }
 
-<h1><%=l 'Prof' %></h1>
-<p><%=l 'Learn and memorize by creating your quizzes and playing them.' %></p>
-<p><%=l 'I (Waïl Yahyaoui) have designed this website to help learn a new language and its words in particular.' %> <%=l 'You can create a quiz that represents a lesson, each item is a word you want to learn, with its translation in your native language as the question, and the word in the language you are learning as the answer.' %></p>
-<p><%=l 'You can create quizzes and play them.' %> <%=l 'You can make your quiz public and share it with other people.' %> <%=l 'You can connect to your dashboard and this website will automatically choose a question for you, preferably a question that you have not answered yet or one where you made more mistakes.' %></p>
-<p><%=l "More features will come later, don't hesitate to give me some feedback." %> <%=l 'I am actively using this website to help me learn!' %></p>
-% if (! session 'id') {
-<p><%=l 'Create an account and log in to start your quizzes.' %></p>
-% }
+<div class="row" style="margin-bottom: 10%">
+    <h2><%=l 'Open source' %></h2>
+    <p><%=l 'This website is an Open Source project.' %></p>
 
-<h1><%=l 'Open source' %></h1>
-<p><%=l 'This website is an Open Source project.' %></p>
-
-<h1><%=l 'Privacy First' %></h1>
-<p><%=l 'All data collected by this website only serves the functioning of the quizzes.' %> <%=l 'No data is shared with third parties.' %> <%=l 'We collect just the minimum to make this site work.' %> <%=l "For example, you don't have to give an email address to create an account, but if you do so, you won't be able to recover your account if you lose your password!" %></p>
+    <h2><%=l 'Privacy First' %></h2>
+    <p><%=l 'All data collected by this website only serves the functioning of the quizzes.' %> <%=l 'No data is shared with third parties.' %> <%=l 'We collect just the minimum to make this site work.' %> <%=l "For example, you don't have to give an email address to create an account, but if you do so, you won't be able to recover your account if you lose your password!" %></p>
+</div>

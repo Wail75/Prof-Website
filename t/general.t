@@ -93,7 +93,7 @@ subtest 'Create a quiz' => sub {
     ->status_is(200)
     ->text_like('b' => qr/Login successful/);
 
-  $t->get_ok($dashboard_page)->status_is(200)->text_is('h1#author a' => 'Quiz Authoring');
+  $t->get_ok($dashboard_page)->status_is(200)->text_is('h2#author a' => 'Quiz Authoring');
 
   $t->get_ok($author_page)->status_is(200)->text_is('h1' => 'Authoring')->text_is('h3' => 'Create a quiz');
 
@@ -120,14 +120,14 @@ subtest 'Create a quiz' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_is('h1#quiz-name'       => "Quiz: $quiz_name")
+    ->text_is('h3#quiz-name'       => "Quiz: $quiz_name")
     ->text_is('p#question-asked b' => $question1);
 
   $item1_id = $t->tx->res->dom->at('input[name=item_id]')->attr('value');
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_is('h1#quiz-name'       => "Quiz: $quiz_name")
+    ->text_is('h3#quiz-name'       => "Quiz: $quiz_name")
     ->text_is('p#question-asked b' => $question1);
 
   $t->get_ok($respond_page => form => {csrf($dashboard_page), item_id => $quiz_id, response => $answer1})
