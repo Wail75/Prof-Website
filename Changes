@@ -1,3 +1,11 @@
 
+0.91  2026-08-21
+  - adopted Skeleton and integrated it in templates; moved the connected top bar to the top for consistency
+  - created a dedicated css dir
+  - added a charset to the default layout
+  - removed a useless level in t/ to simplify the structure and avoid a renaming when adapting blank
+  - added a BEFORE_RELEASE help file
+
+
 0.90  2026-08-12
   - First release, not yet 1.0 in case some serious flaws appear.
