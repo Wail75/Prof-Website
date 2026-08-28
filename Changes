@@ -1,4 +1,8 @@
 
+0.92  2026-08-28
+  - updated a template for Skeleton
+  - added a missing translation
+
 0.91  2026-08-21
   - adopted Skeleton and integrated it in templates; moved the connected top bar to the top for consistency
   - created a dedicated css dir
