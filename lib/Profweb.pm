@@ -106,6 +106,17 @@ sub make_pg_connec_string_from_conf {
 sub startup {
   my ($self) = shift;
 
+  # security headers
+  $self->hook(
+    before_dispatch => sub ($c) {
+      $c->res->headers->header('X-Frame-Options'           => 'DENY');
+      $c->res->headers->header('X-Content-Type-Options'    => 'nosniff');
+      $c->res->headers->header('Strict-Transport-Security' => 'max-age=3600');
+      $c->res->headers->header(
+        'Content-Security-Policy' => "default-src 'self'; frame-ancestors 'self'; form-action 'self';");
+    }
+  );
+
   # more detailed form validation
   $self->validator->add_check(min => sub ($v, $name, $value, $min) { length($value) < $min });
   $self->validator->add_check(max => sub ($v, $name, $value, $max) { length($value) > $max });
