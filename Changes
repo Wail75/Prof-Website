@@ -1,4 +1,7 @@
 
+0.93  2026-08-31
+  - added HTTP security headers
+
 0.92  2026-08-28
   - updated a template for Skeleton
   - added a missing translation

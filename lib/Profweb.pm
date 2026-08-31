@@ -14,7 +14,7 @@ use Profweb::Model::Emailer;
 use Profweb::Model::Accounts;
 use Profweb::Model::Prof;
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 
 =encoding utf8
