@@ -17,6 +17,8 @@ use Profweb::Model::Prof;
 our $VERSION = '0.92';
 
 
+=encoding utf8
+
 =head1 NAME
 
 Profweb - a website for creating and doing quizzes to help you learn
