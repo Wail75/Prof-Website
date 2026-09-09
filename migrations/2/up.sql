@@ -43,7 +43,7 @@ CREATE TABLE quiz_item_links (
 
 CREATE TABLE results (
     id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    creation_time TIMESTAMP DEFAULT now(),
+    creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     item_id       BIGINT NOT NULL,
     response      VARCHAR(1200),
     grade         INTEGER NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE results (
 
 CREATE TABLE sessions (
     id            BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    creation_time TIMESTAMP DEFAULT now(),
+    creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     quiz_id       BIGINT NOT NULL,
     -- next_item_id is NULL when the last item has been reached
     next_item_id  BIGINT,

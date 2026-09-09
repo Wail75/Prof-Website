@@ -15,7 +15,7 @@ CREATE TABLE users (
     -- a code for the user subscription status: 1 unsubscribed user
     subscription INTEGER DEFAULT '1',
 
-    created_at  TIMESTAMP NOT NULL DEFAULT now(),
+    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     archived_at TIMESTAMP,
 
     CHECK (name IS NOT NULL OR email IS NOT NULL)
