@@ -9,7 +9,7 @@
 
 %= include 'common/_notifications'
 
-<div class="row" style="margin-bottom: 5%">
+<div class="row">
   <h2 id="author"><%= link_to author_index => begin %><%=l('Quiz Authoring')%><%end%></h2>
   <%= link_to author_index => begin %><%=l('Click here to create and edit quizzes.')%><%end%>
 </div>

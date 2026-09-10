@@ -9,7 +9,7 @@
 
 %= include 'common/_notifications'
 
-<div class="row" style="margin-bottom: 5%">
+<div class="row">
   <h2><%= l('Manage quizzes') %></h2>
   <h3><%= l('Create a quiz') %></h3>
   %= form_for 'add_quiz' => begin
@@ -71,7 +71,7 @@
           <tr><th><%=l('Question')%></th><th><%=l('Answer')%></th><th><%=l('Actions')%></th></tr>
           % foreach my $item (@{$quizs_to_items->{$quiz_name}}) {
           <tr>
-              %= form_for 'update_item', style => "display: inline;" => begin
+              %= form_for 'update_item' => begin
                   %= csrf_field
                   %= hidden_field item_to_update => $item->{id}
                   %= hidden_field old_question => $item->{question}
@@ -84,16 +84,21 @@
               </td>
               <td>
                   %= submit_button l('Change'), id => "update_item_$item->{id}"
+              </td>
               %= end
-              %= form_for 'delete_item', style => "display: inline;" => begin
+              %= form_for 'delete_item' => begin
                   %= csrf_field
                   %= hidden_field item_to_delete => $item->{id}
+              <td>
                   %= submit_button l('Delete'), id => "delete_item_$item->{id}"
               %= end
               </td>
 
           </tr>
           % }
+      </table>
+      <table>
+          <tr><th><%=l('New question')%></th><th><%=l('New answer')%></th><th><%=l('Actions')%></th></tr>
           <tr>
               %= form_for 'add_new_item_to_quiz' => begin
                   %= csrf_field
@@ -101,8 +106,8 @@
                   %= hidden_field quiz_id => $quiz_id
                   %# give focus to this text field if this is the selected quiz
                   % my @focus = (session('selected_quiz') && session('selected_quiz') eq $quiz_id) ? (autofocus => '') : ();
-              <td><%= text_field 'new_question', style => "font-size:170%;line-height:2.5em;", @focus %></td>
-              <td><%= text_field 'new_answer', style => "font-size:170%;line-height:2.5em;" %></td>
+              <td><%= text_area 'new_question', rows => 2, class => 'large-text', @focus %></td>
+              <td><%= text_area 'new_answer', rows => 2, class => 'large-text' %></td>
               <td><%= submit_button l('Add new item to quiz'), id => "add_new_item_quiz_$quiz_name" %></td>
               %= end
           </tr>
