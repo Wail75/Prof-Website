@@ -119,7 +119,7 @@
 
 % }
 
-<div class="row" style="margin-bottom: 10%">
+<div class="row">
     <h2><%=l 'Open source' %></h2>
     <p><%=l 'This website is an Open Source project.' %></p>
 

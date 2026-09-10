@@ -5,3 +5,19 @@
 .valid {
     color: green
 }
+
+#top-bar {
+    margin-top: 02%
+}
+
+.correct-answer {
+    color: green
+}
+
+.wrong-answer {
+    color: red
+}
+
+.large-text {
+    font-size: 150%
+}
