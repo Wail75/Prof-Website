@@ -569,4 +569,41 @@ sub modify_profile {
 
 }
 
+# delete an entire user account, also remove the session (like a log out)
+sub delete_user {
+  my $c = shift;
+  my ($err, $msg) = ('', '');
+
+  my $user_id = $c->session('id') || '';
+  return $c->flash(error => 'You need to log in first.')->redirect_to('index') unless $user_id;
+
+  my $v = $c->validation();
+  $v->csrf_protect;
+  if ($c->validation_failed($v, 'Delete user')) {
+    return $c->redirect_to('account');
+  }
+
+  my $log = $c->log_context("delete_user '$user_id'");
+  $log->info("start.");
+  my $res = $c->accounts->delete_user($user_id);
+  if (!$res) {
+
+    # don't forget to log out the user
+    $c->session(expires => 1);
+
+    # can't show a message since we are killing the session
+    $log->info("done.");
+  }
+  else {
+    $err = 'Delete user failed.';
+    $log->warn("failed '$res'.");
+  }
+
+  $c->flash(error => $err) if $err;
+
+  # warning: won't work if the session has been killed
+  $c->flash(message => $msg) if $msg;
+  $c->redirect_to('index');
+}
+
 1;

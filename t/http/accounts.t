@@ -60,6 +60,9 @@ my $ask_email_change = '/account/email';
 # an endpoint for modifying the user account password
 my $modify_account_password = '/account/password';
 
+# an endpoint for delete the user account
+my $delete_user = '/account/delete-user';
+
 # password recovery
 my $recover_password = '/recover-password';
 my $reset_password   = '/reset-password';
@@ -612,6 +615,31 @@ subtest 'Profile management' => sub {
 
   $t->get_ok($logout_page)->status_is(200);
 
+};
+
+subtest 'Delete user' => sub {
+
+  $t->post_ok($login_page => form => {csrf($login_form), name => $name2, pwd => $pwd})
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/Login successful/);
+
+  $t->get_ok($account_page)
+    ->status_is(200)
+    ->text_like('p#user-delete', qr/You can delete your entire user account/, 'delete user account')
+    ->attr_like('p#user-delete input', 'value', qr/Delete your entire user account/, 'button to delete user account');
+
+  $t->post_ok($delete_user => form => {})
+    ->status_is(200)
+    ->text_like('b#notif-error' => qr/You can not do that/, 'missing CSRF token');
+
+  $t->post_ok($delete_user => form => {csrf($account_page)})->status_is(200);
+
+  # can't show a flash message without session?
+  # ->text_like('b#notif-ok', qr/Your user account has been permanently deleted/);
+
+  $t->post_ok($login_page => form => {csrf($login_form), name => $name2, pwd => $pwd})
+    ->status_is(200)
+    ->text_like('p#login-error' => qr/$wrong_login_err_msg/);
 };
 
 

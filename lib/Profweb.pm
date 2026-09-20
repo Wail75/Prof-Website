@@ -277,6 +277,9 @@ sub startup {
   $account->post('/email')->to(action => 'ask_email_change')->name('ask_email_change');
   $account->post('/password')->to(action => 'modify_user_password')->name('modify_user_password');
 
+  # delete user account
+  $account->post('/delete-user')->to('account#delete_user')->name('delete_user');
+
   # public profiles
   $logged_in->post('/profiles')->to('account#modify_profile')->name('modify_profile');
 

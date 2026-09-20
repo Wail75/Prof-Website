@@ -6,6 +6,11 @@
     color: green
 }
 
+.radical {
+    font-weight: bold;
+    background-color: red
+}
+
 #top-bar {
     margin-top: 02%
 }
