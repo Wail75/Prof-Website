@@ -11,15 +11,15 @@
 
 <div class="row">
   <h2 id="author"><%= link_to author_index => begin %><%=l('Quiz Authoring')%><%end%></h2>
-  <%= link_to author_index => begin %><%=l('Click here to create and edit quizzes.')%><%end%>
+  <%= link_to author_index => (id => 'author') => begin %><%=l('Click here to create and edit quizzes.')%><%end%>
 </div>
 
 <div class="row">
   %= include 'common/_do_quiz'
 </div>
 
-<div class="row">
-  % if ($quizs) {
+<div id="small-quiz" class="row">
+  % if (@$quizs) {
       %= form_for 'dashboard', method => 'POST' => begin
           %= csrf_field
           %= label_for selected_quiz => l('Select the quiz you want to do')
@@ -27,6 +27,8 @@
           %= select_field selected_quiz => [map {[$_->{name} => $_->{id}, ( $selected_quiz_name && $selected_quiz_name eq $_->{name} ? ('selected' => '') : ()) ]} @$quizs], id => 'selected_quiz'
           %= submit_button l('Select')
       %= end
+  % } else {
+      <p><%=l('You have no quiz yet.')%> <%=l('Start by authoring one.')%></p>
   % }
 </div>
 

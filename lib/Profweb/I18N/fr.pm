@@ -266,7 +266,10 @@ our %Lexicon = (
   'No quiz found.'                                              => "Aucun quiz trouvé.",
   'To get more questions, please create an account and log in.' =>
     "Pour avoir plus de questions, veuillez créer un compte utilisateur et vous connecter.",
-  'Direct link to this quiz.' => "Lien direct vers ce quiz."
+  'Direct link to this quiz.' => "Lien direct vers ce quiz.",
+
+  'You have no quiz yet.'   => "Vous n'avez pas encore de quiz.",
+  'Start by authoring one.' => "Commencez par en éditer un."
 
   # '' => "",
 );
