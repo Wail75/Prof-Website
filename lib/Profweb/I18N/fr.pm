@@ -212,6 +212,11 @@ our %Lexicon = (
     "Vous devez donner une nouvelle description, même si celle-ci est vide.",
   'The new profile description is too long.' => "La nouvelle description de profil est trop longue.",
 
+  'You can delete your entire user account here: '  => "Vous pouvez effacer entièrement votre compte utilisateur",
+  'Delete user failed.'                             => "L'effacement du compte utilisateur a échoué.",
+  'Delete your entire user account'                 => "Effacer entièrement votre compte utilisateur",
+  'Your user account has been permanently deleted.' => "Votre compte utilisateur a été effacé définitivement.",
+
   'Click here to create and edit quizzes.' => "Cliquez ici pour créer et modifier des quizs.",
 
   'Authoring'                                                   => "Édition",

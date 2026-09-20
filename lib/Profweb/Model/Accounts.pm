@@ -432,4 +432,23 @@ sub get_user_payments {
   return '';
 }
 
+sub delete_user {
+  my ($self, $user_id) = @_;
+
+  return 'Parameter missing: user_id.' unless $user_id;
+
+  my $query  = 'DELETE FROM users WHERE id = $1';
+  my @params = ($user_id);
+  my $res;
+  eval { $res = $self->pg->db->query($query, @params); 1 } or do {
+    my $err_str = $self->_db_error_str($@, $query, @params);
+    if ($err_str =~ /Key \(user_id\)=\($user_id\) is not present in table "users"/) {
+      $err_str = "No user for id '$user_id'.";
+    }
+    return error => $err_str;
+  };
+
+  return '';
+}
+
 1;

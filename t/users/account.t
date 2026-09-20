@@ -177,6 +177,15 @@ is($res, '', 'modify user description no error');
 is($res{error},       undef, 'get user description after modif no error');
 is($res{description}, $desc, 'get user description after modif description correct');
 
+$res = $accounts->delete_user();
+like($res, qr/Parameter missing: user_id/, 'delete user no param error message');
+$res = $accounts->delete_user($id);
+is($res, '', 'delete user ok');
+%res = $accounts->get_user_description($id);
+like($res{error}, qr/No account found for user.*$id/, 'get user description after deletion no user error message');
+%res = $accounts->get_user_infos(id => $id);
+like($res{error}, qr/No account found for id.*$id/, 'get user infos after deletion no user error message');
+
 # delete the temporary test schema
 $t->app->pg->migrations->migrate(0);
 

@@ -15,7 +15,6 @@
 % }
 %= form_for modify_user_name => begin
     %= csrf_field
-    <%= hidden_field 'user-id' => $id %>
     <p id="name-change">
     <%=l('You can give a new account name here: ')%>
 % my $name_change_errors = flash('name_change_errors') || {};
@@ -62,6 +61,13 @@
 </p>
 % end
 
+<p id="email-verif">
+% if ( $email && $email_verified eq 'no' ) {
+    <%=l('Your email address is not verified yet.')%> <%=l('Check your email inbox and your spams.')%> <%=l('Once you have the verification email, click the link inside it to verify your email address.')%>
+    <%=l('To send the verification email again, click on this link')%>
+% }
+</p>
+
 </div>
 
 <div id="password-control">
@@ -83,7 +89,6 @@
         % }
     % end
     <%= password_field 'new-pwd1' %>
-
     <%=l('Repeat the new password here: ')%>
     % if ( my $e = $password_change_errors->{'new-pwd2'} ) {
     <b id="error-new-pwd2" class="error">
@@ -92,7 +97,6 @@
     </b>
     % }
     <%= password_field 'new-pwd2' %>
-
     <%=l('Give your current password: ')%>
     % if ( my $e = $password_change_errors->{'current-pwd'} ) {
     <b id="error-current-pwd" class="error">
@@ -101,17 +105,21 @@
     </b>
     % }
     <%= password_field 'current-pwd' %>
-
     <%= submit_button l('Save the new password') %>
 </p>
 % end
 
-<p id="email-verif">
-% if ( $email && $email_verified eq 'no' ) {
-    <%=l('Your email address is not verified yet.')%> <%=l('Check your email inbox and your spams.')%> <%=l('Once you have the verification email, click the link inside it to verify your email address.')%>
-    <%=l('To send the verification email again, click on this link')%>
-% }
+</div>
+
+<div id="radical-control">
+
+%= form_for delete_user => begin
+    %= csrf_field
+<p id="user-delete">
+    <%=l('You can delete your entire user account here: ')%>
+    <%= submit_button l('Delete your entire user account'), class => 'button radical' %>
 </p>
+% end
 
 </div>
 
