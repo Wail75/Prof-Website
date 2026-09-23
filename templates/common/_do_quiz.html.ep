@@ -30,5 +30,5 @@
     % }
 
 % } else {
-<h3><%=l('No quiz found.')%></h3>
+<p><%=l('No quiz found.')%></p>
 % }

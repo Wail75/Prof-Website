@@ -26,3 +26,7 @@
 .large-text {
     font-size: 150%
 }
+
+div.bloc {
+  margin-top: 3rem
+}

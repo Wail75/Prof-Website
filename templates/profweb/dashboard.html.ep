@@ -5,20 +5,24 @@
 
 %= include 'common/_connected_top_bar'
 
-<h1><%=l('Dashboard')%></h1>
+<div class="row bloc">
+    <h1><%=l('Dashboard')%></h1>
+</div>
 
 %= include 'common/_notifications'
 
-<div class="row">
+<div class="row bloc">
   <h2 id="author"><%= link_to author_index => begin %><%=l('Quiz Authoring')%><%end%></h2>
-  <%= link_to author_index => (id => 'author') => begin %><%=l('Click here to create and edit quizzes.')%><%end%>
+  <p><%= link_to author_index => (id => 'author') => begin %><%=l('Click here to create and edit quizzes.')%><%end%></p>
 </div>
 
-<div class="row">
+<div class="row bloc">
+  <h2 id="single-question"><%=l('Single Question')%></h2>
   %= include 'common/_do_quiz'
 </div>
 
-<div id="small-quiz" class="row">
+<div id="small-quiz" class="row bloc">
+  <h2 id="do-quiz"><%=l('Do a quiz')%></h2>
   % if (@$quizs) {
       %= form_for 'dashboard', method => 'POST' => begin
           %= csrf_field

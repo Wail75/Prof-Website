@@ -220,7 +220,9 @@ our %Lexicon = (
   'Click here to create and edit quizzes.' => "Cliquez ici pour créer et modifier des quizs.",
 
   'Authoring'                                                   => "Édition",
+  'Do a quiz'                                                   => "Faire un Quiz",
   'Quiz Authoring'                                              => "Édition des Quizs",
+  'Single Question'                                             => "Question Unique",
   'Prof: Authoring'                                             => "Prof : Édition",
   'Manage quizzes'                                              => "Gestion des quizs",
   'Create a quiz'                                               => "Créer un quiz",
