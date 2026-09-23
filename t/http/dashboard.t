@@ -53,11 +53,11 @@ my $dashboard_page = '/dashboard';
 my $wrong_login_err_msg   = "Wrong user name or password";
 my $missing_login_err_msg = "must give a user name and a password";
 
-my $name            = 'wailtest3';
-my $invalid_pwd     = '123';
-my $pwd             = 'liaw12345';
-my $email           = 'test@test.org';
-my $name2           = 'wailtest4';
+my $name        = 'wailtest3';
+my $invalid_pwd = '123';
+my $pwd         = 'liaw12345';
+my $email       = 'test@test.org';
+my $name2       = 'wailtest4';
 
 # this id should not work with a new test because it contains a timestamp from the past
 my $unknown_id = 'c192a18f-6d7c-4cab-b880-c1c670c4699b';
@@ -84,7 +84,7 @@ subtest 'Basic dashboard features' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_like('h1' => qr/Dashboard/)
+    ->text_like('h1'          => qr/Dashboard/)
     ->text_like('h2#author a' => qr/Quiz Authoring/)
     ->attr_is('a#author', 'href', '/author', 'link to the authoring page')
     ->text_like('div#small-quiz p', qr/no quiz yet/, 'help for no quiz yet');
