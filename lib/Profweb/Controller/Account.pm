@@ -281,7 +281,7 @@ sub ask_email_change {
 
   my $new_email = $c->param('new-email');
 
-  my $log = $c->log_context("change_user_email '$user_id'/'$new_email'");
+  my $log = $c->log_context("ask_email_change '$user_id'/'$new_email'");
   $log->info("start.");
   my %res = $c->accounts->get_user_infos(id => $user_id);
   if (!%res || !exists $res{email}) {
