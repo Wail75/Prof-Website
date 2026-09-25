@@ -26,7 +26,7 @@
       % foreach my $quiz (@$quizs) {
           % my ($quiz_id, $quiz_name, $quiz_visibility) = ($quiz->{id}, $quiz->{name}, $quiz->{visible});
       <h4><%= $quiz_name %></h4>
-      <table>
+      <table id="quiz-<%=$quiz_name%>">
           <tr>
           %= form_for 'update_quiz_name' => begin
               %= csrf_field
@@ -67,7 +67,7 @@
       </table>
 
       <%= link_to url_for('do_quizs', 'author' => $user_id, 'quiz' => $quiz_id) => begin %><%=l('Direct link to this quiz.')%><%end%>
-      <table>
+      <table id="items-<%=$quiz_name%>">
           <tr><th><%=l('Question')%></th><th><%=l('Answer')%></th><th><%=l('Actions')%></th></tr>
           % foreach my $item (@{$quizs_to_items->{$quiz_name}}) {
           <tr>

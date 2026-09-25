@@ -12,6 +12,7 @@ sub log_context {
 }
 
 # send an email to a newly registered user with a link to verify that he can read his emails
+# returns true if success, false otherwise
 sub _send_verification_email {
   my ($c, $email_address) = @_;
 
@@ -35,6 +36,7 @@ sub _send_verification_email {
 }
 
 # send an email to a registered user with a link to verify that he can read his emails
+# returns true if success, false otherwise
 sub _send_verification_email_change {
   my ($c, $email_address) = @_;
 
@@ -58,6 +60,7 @@ sub _send_verification_email_change {
 }
 
 # register a new user with a name and/or an email and a password. Send an email for verification.
+# returns true if success, false otherwise
 sub register {
   my $c = shift;
   my ($err, $msg) = ('', '');
@@ -304,7 +307,7 @@ sub ask_email_change {
   }
   else {
     $err = 'This action can not be done for the moment. Please retry later.';
-    $log->warn("failed no result from get_user_infos(id => $user_id).");
+    $log->warn("failed _send_verification_email_change('$new_email').");
   }
 
   $c->flash(error   => $err) if $err;

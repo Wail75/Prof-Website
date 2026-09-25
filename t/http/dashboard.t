@@ -87,7 +87,7 @@ subtest 'Basic dashboard features' => sub {
     ->text_like('h1'          => qr/Dashboard/)
     ->text_like('h2#author a' => qr/Quiz Authoring/)
     ->attr_is('a#author', 'href', '/author', 'link to the authoring page')
-    ->text_like('div#small-quiz p', qr/no quiz yet/, 'help for no quiz yet');
+    ->text_like('div#do-quiz p', qr/no quiz yet/, 'help for no quiz yet');
 
   $t->get_ok($logout_page)->status_is(200);
 };

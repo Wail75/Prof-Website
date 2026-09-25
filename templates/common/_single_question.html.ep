@@ -1,25 +1,30 @@
-%# required variables: $page_source $selected_quiz_name $item_id $question
+%# required variables: $page_source $single_quiz_name $single_item_id $single_question
 %# required to show correct answers $last_response_quiz_type
 %# expects flash or session variable 'response_msg' to show if the response to quiz is correct or not
 
-% if ($selected_quiz_name) {
+% if ($single_item_id && $single_question) {
 
-<h3 id="quiz-name"><%=l('Quiz: ') . $selected_quiz_name%></h3>
+%# <h3 id="quiz-name"><%=l('Quiz: ') . $selected_quiz_name%></h3>
 
-    % if ($last_response_quiz_type && $last_response_quiz_type eq 'whole-quiz') {
+    % if ($last_response_quiz_type && $last_response_quiz_type eq 'single-question') {
       %= include 'common/_response_result'
     % }
 
-    % if ($item_id) {
+    % if ($single_item_id) {
 
-<p id='question-asked'><%=l('Question:') . ' '%><span id="question" class="question"><%=$question%></span></p>
+<p id='question-asked'>
+  <%=l('Question:') . ' '%><span id="question" class="question"><%=$single_question%></span>
+      % if ($single_quiz_name) {
+  <%=l('from the quiz')%> <%=$single_quiz_name%>
+      % }
+</p>
 <p><%=l('Your answer')%></p>
 <p>
 %= form_for 'respond_question' => begin
     %= csrf_field
     %= hidden_field page_source => $page_source
-    %= hidden_field quiz_type => 'whole-quiz'
-    %= hidden_field item_id => $item_id
+    %= hidden_field quiz_type => 'single-question'
+    %= hidden_field item_id => $single_item_id
     %= text_area 'response', cols => 40, rows => 3, class => 'large-text', autofocus => '', autocomplete => 'off'
     %= submit_button l('Send')
 %= end

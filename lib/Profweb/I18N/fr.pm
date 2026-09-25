@@ -257,6 +257,7 @@ our %Lexicon = (
   'Question from the quiz: '                                    => "Question du quiz : ",
   'Quiz:'                                                       => "Quiz : ",
   'Question:'                                                   => "Question :",
+  'from the quiz'                                               => "du quiz",
   'No item for this quiz.'                                      => "Pas d'item pour ce quiz.",
   'Public quiz'                                                 => "Quiz public",
   'Private quiz'                                                => "Quiz privé",

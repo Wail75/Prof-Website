@@ -1,0 +1,5 @@
+%# expects flash or session variable 'response_msg' to show if the response to quiz is correct or not
+
+% if (my $msg = flash('response_msg') || stash('response_msg')) {
+<p id='response-result' class="<%= $msg =~ /Good/i ? 'correct-answer' : 'wrong-answer' %>"><%=l($msg)%></p>
+% }
