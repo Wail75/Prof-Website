@@ -45,6 +45,10 @@ See statistics on your responses
   get_average_grade(item_id => $item_id);
   get_average_grade(quiz => 'quiz');
 
+Get a single question from all your quizzes
+
+  single_question($user_id);
+
 See all quizzes
 
   my @quizzes = get_quizzes();
@@ -296,6 +300,51 @@ EOS
   }
 
   return (status => 1, item_id => $item_id, question => $question);
+}
+
+# get a single question from the user's own quizs, with the priority formula
+# Parameters:
+# - user_id: mandatory
+# returns a hash, if error the hash has only one key 'error' with value an error message
+# if success, the hash has one question key, with the text of the question and one item_id key to
+# use with the next respond_question method
+sub single_question {
+  my ($self, $user_id) = @_;
+
+  return (status => 0, msg => 'Parameter missing: user_id') unless $user_id;
+
+  # the priority formula favors questions without answers, then a mix of low correct rate or low answer rate
+  # we take advantage of the bare colum 'results.item_id' to sort first items that don't have any
+  # result (the NULL value in results.item_id makes it sort first)
+  # NOTE keep in sync with the priority formula from sub next_question
+  my $query = <<"EOS";
+SELECT items.id, items.question, quizs.name
+FROM items
+    JOIN quiz_item_links ON items.id = quiz_item_links.item_id
+    JOIN quizs ON quiz_item_links.quiz_id = quizs.id
+    LEFT JOIN results ON items.id = results.item_id
+WHERE quizs.user_id = \$1
+GROUP BY items.id, results.item_id, quiz_item_links.rank, quizs.name
+-- multiply by 10 so that there is distinction even at a low count of results
+-- NULLS FIRST because if no result, the expression value is NULL
+ORDER BY (10 * COUNT(*) + 20 * AVG(results.grade) / ${MAX_GRADE}::REAL * COUNT(*)) ASC NULLS FIRST,
+    results.item_id ASC NULLS FIRST, quiz_item_links.rank, items.id ASC
+LIMIT 1
+EOS
+
+  my @params = ($user_id);
+  my $res;
+  eval { $res = $self->pg->db->query($query, @params); 1 }
+    or do { return (status => 0, msg => $self->_db_error_str($@, $query, @params)) };
+  if ($res->rv < 1) {
+    return (status => 0, msg => "Could not find an item.");
+  }
+  my ($item_id, $question, $quiz_name) = @{$res->array};
+  if (!$item_id) {
+    return (status => 0, msg => "Could not find an item.");
+  }
+
+  return (status => 1, item_id => $item_id, question => $question, quiz_name => $quiz_name);
 }
 
 # compares two strings but before using eq, this subroutine does the following:

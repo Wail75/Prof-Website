@@ -11,19 +11,23 @@
 
 %= include 'common/_notifications'
 
-<div class="row bloc">
+<div id="single-question" class="row bloc">
+  <h2 id="single-question"><%=l('Single Question')%></h2>
+  %= include 'common/_single_question'
+</div>
+
+<div id="author" class="row bloc">
   <h2 id="author"><%= link_to author_index => begin %><%=l('Quiz Authoring')%><%end%></h2>
   <p><%= link_to author_index => (id => 'author') => begin %><%=l('Click here to create and edit quizzes.')%><%end%></p>
 </div>
 
-<div class="row bloc">
-  <h2 id="single-question"><%=l('Single Question')%></h2>
-  %= include 'common/_do_quiz'
-</div>
+<div id="do-quiz" class="row bloc">
 
-<div id="small-quiz" class="row bloc">
   <h2 id="do-quiz"><%=l('Do a quiz')%></h2>
   % if (@$quizs) {
+
+      %= include 'common/_do_quiz'
+
       %= form_for 'dashboard', method => 'POST' => begin
           %= csrf_field
           %= label_for selected_quiz => l('Select the quiz you want to do')
@@ -31,9 +35,11 @@
           %= select_field selected_quiz => [map {[$_->{name} => $_->{id}, ( $selected_quiz_name && $selected_quiz_name eq $_->{name} ? ('selected' => '') : ()) ]} @$quizs], id => 'selected_quiz'
           %= submit_button l('Select')
       %= end
+
   % } else {
       <p><%=l('You have no quiz yet.')%> <%=l('Start by authoring one.')%></p>
   % }
+
 </div>
 
 </div>

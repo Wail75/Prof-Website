@@ -61,17 +61,17 @@ my $add_item_page = "$author_page/add-new-item-to-quiz";
 # respond to a question
 my $respond_page = "/respond-question";
 
-my $name      = 'wailtest3';
-my $pwd       = 'liaw12345';
-my $quiz_name = 'Test quiz été';
+my $name = 'wailtest3';
+my $pwd  = 'liaw12345';
+my ($quiz1_name, $quiz2_name) = ('Test quiz été', 'Autumn');
+
+my ($question1, $answer1) = ('Quèsaco?',                          'τίποτα');
+my ($question2, $answer2) = ('Bonjour?',                          'Bonjour!');
+my ($question3, $answer3) = ('What does it have in its pockets?', 'Birthday present');
 
 # to be found in web page
-my $quiz_id;
-my $question1 = 'Quèsaco?';
-my $answer1   = 'τίποτα';
-
-# to be found in web page
-my $item1_id;
+my ($quiz1_id, $quiz2_id);
+my ($item1_id, $item2_id, $item3_id);
 
 # get a CSRF token from a page
 sub csrf {
@@ -97,20 +97,20 @@ subtest 'Create a quiz' => sub {
 
   $t->get_ok($author_page)->status_is(200)->text_is('h1' => 'Authoring')->text_is('h3' => 'Create a quiz');
 
-  $t->post_ok($add_quiz_page => form => {csrf($author_page), new_quiz_name => $quiz_name})
+  $t->post_ok($add_quiz_page => form => {csrf($author_page), new_quiz_name => $quiz1_name})
     ->status_is(200)
     ->text_like('b#notif-ok' => qr/Quiz created/)
-    ->text_is('h4' => $quiz_name);
+    ->text_is('h4' => $quiz1_name);
 
-  $quiz_id = $t->tx->res->dom->at('input[name=quiz_id]')->attr('value');
+  $quiz1_id = $t->tx->res->dom->at('input[name=quiz_id]')->attr('value');
 
   $t->post_ok(
     $add_item_page => form => {
       csrf($author_page),
       new_question => $question1,
       new_answer   => $answer1,
-      quiz_id      => $quiz_id,
-      quiz_name    => $quiz_name
+      quiz_id      => $quiz1_id,
+      quiz_name    => $quiz1_name
     }
     )
     ->status_is(200)
@@ -118,28 +118,135 @@ subtest 'Create a quiz' => sub {
     ->attr_is('td input[name=updated_question]', 'value', $question1)
     ->attr_is('td input[name=updated_answer]',   'value', $answer1);
 
+  $t->get_ok($logout_page)->status_is(200);
+};
+
+subtest 'Respond to a whole quiz' => sub {
+
+  $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})
+    ->status_is(200)
+    ->text_like('b' => qr/Login successful/);
+
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_is('h3#quiz-name'       => "Quiz: $quiz_name")
-    ->text_is('p#question-asked b' => $question1);
+    ->text_is('div#do-quiz h3#quiz-name'          => "Quiz: $quiz1_name")
+    ->text_is('div#do-quiz p#question-asked span' => $question1);
 
-  $item1_id = $t->tx->res->dom->at('input[name=item_id]')->attr('value');
+  $item1_id = $t->tx->res->dom->at('div#single-question input[name=item_id]')->attr('value');
+
+  $t->get_ok(
+    $respond_page => form => {
+      csrf($dashboard_page),
+      page_source => 'dashboard',
+      quiz_type   => 'whole-quiz',
+      item_id     => $item1_id,
+      response    => $answer1
+    }
+  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+
+  $t->get_ok(
+    $respond_page => form => {
+      csrf($dashboard_page),
+      page_source => 'dashboard',
+      quiz_type   => 'whole-quiz',
+      item_id     => $item1_id,
+      response    => "x$answer1"
+    }
+  )->status_is(200)->text_like('p#response-result' => qr/Wrong answer/);
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_is('h3#quiz-name'       => "Quiz: $quiz_name")
-    ->text_is('p#question-asked b' => $question1);
+    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz1_name/)
+    ->text_is('div#single-question span#question' => $question1);
 
-  $t->get_ok($respond_page => form => {csrf($dashboard_page), item_id => $quiz_id, response => $answer1})
-    ->status_is(200)
-    ->text_like('p#response-result' => qr/Good answer/);
+  # add another question, it should be the next Single Question
+  $t->post_ok(
+    $add_item_page => form => {
+      csrf($author_page),
+      new_question => $question2,
+      new_answer   => $answer2,
+      quiz_id      => $quiz1_id,
+      quiz_name    => $quiz1_name
+    }
+  )->status_is(200)->text_like('b#notif-ok' => qr/Item created/);
 
-  $t->get_ok($respond_page => form => {csrf($dashboard_page), item_id => $quiz_id, response => "x$answer1"})
+  $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_like('p#response-result' => qr/Wrong answer/);
+    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz1_name/)
+    ->text_is('div#single-question span#question' => $question2);
+
+  $item2_id = $t->tx->res->dom->at('div#single-question input[name=item_id]')->attr('value');
+
+  # answer correctly two times the new question then the Single Question will be the previous question
+  $t->get_ok(
+    $respond_page => form => {
+      csrf($dashboard_page),
+      page_source => 'dashboard',
+      quiz_type   => 'single-question',
+      item_id     => $item2_id,
+      response    => $answer2
+    }
+  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+
+  $t->get_ok($dashboard_page)
+    ->status_is(200)
+    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz1_name/)
+    ->text_is('div#single-question span#question' => $question2);
+
+  $t->get_ok(
+    $respond_page => form => {
+      csrf($dashboard_page),
+      page_source => 'dashboard',
+      quiz_type   => 'single-question',
+      item_id     => $item2_id,
+      response    => $answer2
+    }
+  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+
+  $t->get_ok($dashboard_page)
+    ->status_is(200)
+    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz1_name/)
+    ->text_is('div#single-question span#question' => $question1);
 
   $t->get_ok($logout_page)->status_is(200);
+};
 
+subtest 'Adding a second quiz' => sub {
+
+  $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})
+    ->status_is(200)
+    ->text_like('b' => qr/Login successful/);
+
+  # add a new quiz with a new item and see it appear in the dashboard
+  $t->post_ok($add_quiz_page => form => {csrf($author_page), new_quiz_name => $quiz2_name})
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/Quiz created/)
+    ->text_is('h4' => $quiz2_name);
+
+  $quiz2_id = $t->tx->res->dom->at("table#quiz-$quiz2_name input[name=quiz_id]")->attr('value');
+
+  $t->post_ok(
+    $add_item_page => form => {
+      csrf($author_page),
+      new_question => $question3,
+      new_answer   => $answer3,
+      quiz_id      => $quiz2_id,
+      quiz_name    => $quiz2_name
+    }
+  )->status_is(200)->text_like('b#notif-ok' => qr/Item created/);
+
+  $t->get_ok($dashboard_page)
+    ->status_is(200)
+    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz2_name/)
+    ->text_is('div#single-question span#question' => $question3);
+
+  $t->get_ok($dashboard_page)
+    ->status_is(200)
+    ->text_is('div#do-quiz h3#quiz-name'          => "Quiz: $quiz2_name")
+    ->text_is('div#do-quiz p#question-asked span' => $question3);
+
+
+  $t->get_ok($logout_page)->status_is(200);
 };
 
 

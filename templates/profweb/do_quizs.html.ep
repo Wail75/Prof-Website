@@ -7,6 +7,9 @@
 
 %= include 'common/_connected_top_bar'
 
+%# for sub templates in order to come back to this page after respond_question
+% my $page_source = 'do_quizs';
+
 %= include 'common/_do_quiz'
 
 </div>

@@ -37,7 +37,10 @@ my $answer1_fragment = '2';
 my $answer1          = "${answer1_fragment}2";
 my $question2        = '1 + 10';
 my $answer2          = '11';
-my ($quiz_id, $quiz2_id);    # to be found after creating the quiz
+my @item_ids         = ();
+my ($quiz_id, $quiz2_id);                # to be found after creating the quiz
+my ($item1_id, $item2_id, $item3_id);    # to be found after creating the quiz
+
 %hres = $prof->create_quiz($user_id, $quiz_name, $question1, $answer1, $question2, $answer2);
 ok($hres{status}, 'quiz creation');
 
@@ -49,8 +52,8 @@ $quiz_id = $hres{quizzes}[0]{id};
 ok($hres{status}, 'first question');
 is($hres{question}, $question1, 'first question in order of creation');
 
-my $item_id = $hres{item_id};
-%hres = $prof->respond_question($user_id, $item_id, $answer1);
+$item1_id = $hres{item_id};
+%hres     = $prof->respond_question($user_id, $item1_id, $answer1);
 ok($hres{status}, 'first response registered');
 ok($hres{grade},  'first response correct');
 
@@ -58,8 +61,8 @@ ok($hres{grade},  'first response correct');
 ok($hres{status}, 'second question');
 is($hres{question}, $question2, 'second question in order of creation');
 
-$item_id = $hres{item_id};
-%hres    = $prof->respond_question($user_id, $item_id, '6');
+$item2_id = $hres{item_id};
+%hres     = $prof->respond_question($user_id, $item2_id, '6');
 ok($hres{status}, 'second response registered');
 ok(!$hres{grade}, 'second response wrong');
 
@@ -76,10 +79,26 @@ $quiz2_id = $hres{quizzes}[0]{id};
 ok($hres{status}, 'non ASCII question');
 is($hres{question}, $question3, 'non ASCII question read');
 
-my $item3_id = $hres{item_id};
-%hres = $prof->respond_question($user_id, $item3_id, $answer3);
+$item3_id = $hres{item_id};
+%hres     = $prof->respond_question($user_id, $item3_id, $answer3);
 ok($hres{status}, 'non ASCII response registered');
 ok($hres{grade},  'non ASCII response correct');
+
+# ask three single questions, they should cover all three previously created items for the two quizzes
+%hres = $prof->single_question($user_id);
+ok($hres{status}, 'single question first');
+is($hres{item_id}, $item2_id, 'single question starts with question with wrong answer');
+push(@item_ids, $hres{item_id});
+%hres = $prof->respond_question($user_id, $hres{item_id}, $answer2);
+%hres = $prof->single_question($user_id);
+ok($hres{status}, 'single question second');
+is($hres{item_id}, $item1_id, 'single question continues with first question created');
+push(@item_ids, $hres{item_id});
+%hres = $prof->respond_question($user_id, $hres{item_id}, $answer1);
+%hres = $prof->single_question($user_id);
+ok($hres{status}, 'single question third');
+is($hres{item_id}, $item3_id, 'single question ends with last question created');
+push(@item_ids, $hres{item_id});
 
 
 # delete the temporary test schema

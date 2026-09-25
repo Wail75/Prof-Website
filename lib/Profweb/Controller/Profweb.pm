@@ -2,6 +2,9 @@ package Profweb::Controller::Profweb;
 
 use Mojo::Base 'Mojolicious::Controller';
 
+# if returning from an endpoint that may be called from different pages
+my $DEFAULT_RETURN_PAGE = 'dashboard';
+
 sub log_context {
   my ($c, $method_name) = @_;
   return $c->app->log->context('[ControllerProfweb]', "[$method_name]");
@@ -37,6 +40,17 @@ sub dashboard {
     $c->session(selected_quiz => $c->param('selected_quiz'));
   }
 
+  ## Single Question
+  my ($single_question_quiz, $single_item_id, $single_question, $single_quiz_name);
+  %hres = $c->prof->single_question($user_id);
+  if (!$hres{status} || !$hres{item_id}) {
+    $log->warn("failed to get single question '$hres{msg}'.");
+  }
+  else {
+    ($single_item_id, $single_question, $single_quiz_name) = @hres{qw(item_id question quiz_name)};
+  }
+
+  ## Do Quiz
   my ($selected_quiz_name, $item_id, $question);
   if (@$quizs) {
 
@@ -55,12 +69,21 @@ sub dashboard {
     }
     else {
       ($item_id, $question) = @hres{qw(item_id question)};
-      $log->info("done.");
     }
   }
+  $log->info("done.");
 
-  return $c->render(selected_quiz_name => $selected_quiz_name, item_id => $item_id, question => $question,
-    quizs => $quizs);
+  return $c->render(
+    page_source             => $c->url_for,
+    last_response_quiz_type => $c->session('last_response_quiz_type') || '',
+    selected_quiz_name      => $selected_quiz_name,
+    item_id                 => $item_id,
+    question                => $question,
+    quizs                   => $quizs,
+    single_item_id          => $single_item_id,
+    single_question         => $single_question,
+    single_quiz_name        => $single_quiz_name
+  );
 }
 
 sub do_quizs {
@@ -89,10 +112,12 @@ sub do_quizs {
   }
 
   return $c->render(
-    selected_quiz_name => $selected_quiz_name,
-    item_id            => $item_id,
-    question           => $question,
-    quiz_id            => $quiz_id
+    page_source             => $c->url_for,
+    last_response_quiz_type => $c->session('last_response_quiz_type') || '',
+    selected_quiz_name      => $selected_quiz_name,
+    item_id                 => $item_id,
+    question                => $question,
+    quiz_id                 => $quiz_id
   );
 }
 
@@ -100,31 +125,31 @@ sub respond_question {
   my $c = shift;
   my $err;
 
-  # the user might come from different pages, send him back on Dashboard by default
-  my $next_page = 'dashboard';
-  if ($c->req->headers->referer && $c->req->headers->referer =~ m!(quizs/[-a-f0-9]+/\d+)$!) {
-
-    # the user comes from a specific Quiz webpage
-    $next_page = $1;
-  }
-
   my $v = $c->validation();
-  $v->csrf_protect()->required('item_id', 'trim', 'not_empty')
 
-    # the response might be anything (empty, leading spaces etc)
+  # the param 'response' might be any string (empty, with leading spaces etc)
+  $v->csrf_protect()
+    ->required('page_source', 'trim', 'not_empty')
+    ->required('quiz_type',   'trim', 'not_empty')
+    ->required('item_id',     'trim', 'not_empty')
     ->required('response');
+
   if ($v->has_error('csrf_token')) {
     $err = 'You can not do that.';
   }
   elsif ($v->has_error()) {
     $err = 'Your answer has not been saved.';
   }
-  return $c->flash(error => $err)->redirect_to($next_page) if $err;
+  my $page_source = $c->param('page_source');
+  return $c->flash(error => $err)->redirect_to($page_source || $DEFAULT_RETURN_PAGE) if $err;
 
+  my $user_id   = $c->session('id') || '';
+  my $quiz_type = $c->param('quiz_type');
+  my $item_id   = $c->param('item_id');
+  my $response  = $c->param('response');
 
-  my $user_id  = $c->session('id') || '';
-  my $item_id  = $c->param('item_id');
-  my $response = $c->param('response');
+  # store the quiz_type so that the template knows which type of quiz is being answered
+  $c->session('last_response_quiz_type' => $quiz_type);
 
   my $log = $c->log_context("respond_question '$user_id'/'$item_id'");
   $log->info("start.");
@@ -147,7 +172,7 @@ sub respond_question {
   }
   $log->info("done.");
 
-  $c->redirect_to($next_page);
+  $c->redirect_to($page_source);
 }
 
 1;
