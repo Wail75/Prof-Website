@@ -43,33 +43,32 @@ The website asks you more often questions on which you erred more
 
 =head1 FEATURES
 
-The user can create quizs. A quiz has a list of items, i.e. a question and an answer. The user can
-then do a quiz, responding to questions and the website tells him if his answers are correct or not.
+The user can create quizs. A quiz has a list of items, i.e. a question and an answer. The user can then do a quiz,
+responding to questions and the website tells him if his answers are correct or not.
 
-The user's answers are saved and when a user starts a quiz, the first questions to be asked will be
-those that the user hasn't answered yet or those with the most errors. There is a simple formula
-that tries to balance these two conditions. At first, questions without user result are favored,
-then it is a mix of low result count and low correct answers count, then, in the long run, questions
-with more user mistakes are favored.
+The user's answers are saved and when a user starts a quiz, the first questions to be asked will be those that the user
+hasn't answered yet or those with the most errors. There is a simple formula that tries to balance these two
+conditions. At first, questions without user result are favored, then it is a mix of low result count and low correct
+answers count, then, in the long run, questions with more user mistakes are favored.
 
-The user can do quizs from his dashboard page, where he can select which quiz to do. There is also
-a direct link for each quiz so that the user can do one quiz in particular.
+The user can do quizs from his dashboard page, where he can select which quiz to do. There is also a direct link for
+each quiz so that the user can do one quiz in particular.
 
-In a quiz page, the answer text input field takes the focus, so that you can directly type in your
-response to the next question when the page reloads. Similarly, after entering a new item in the
-quiz, the focus goes to the new item question text input field. Thus you should be able to enter
-quiz items and answer questions with your keyboard only.
+In a quiz page, the answer text input field takes the focus, so that you can directly type in your response to the next
+question when the page reloads. Similarly, after entering a new item in the quiz, the focus goes to the new item
+question text input field. Thus you should be able to enter quiz items and answer questions with your keyboard only.
 
-When editing a quiz item, the answer field does not remember your input to avoid unnecessary clutter.
-Same thing with previous answers when doing a quiz.
+When a quiz or a question is shown to the user, his average score is displayed (as a percentage of correct answers).
 
-The last used quiz (created, edited, added questions to or selected to do a quiz) is kept in the
-session so that it is preselected. For example, after adding an item to quiz, if you go to the page
-for doing quizzes, the quiz is already selected.
+When editing a quiz item, the answer field does not remember your input to avoid unnecessary clutter. Same thing with
+previous answers when doing a quiz.
 
-A user may choose to make his quiz public. Other users can then do this quiz, with their own results.
-If a non logged in user tries to do a quiz, he may answer one question but he will then be asked to
-create an account and log in.
+The last used quiz (created, edited, added questions to or selected to do a quiz) is kept in the session so that it is
+preselected. For example, after adding an item to quiz, if you go to the page for doing quizzes, the quiz is already
+selected.
+
+A user may choose to make his quiz public. Other users can then do this quiz, with their own results.  If a non logged
+in user tries to do a quiz, he may answer one question but he will then be asked to create an account and log in.
 
 =head1 DEPLOYMENT
 

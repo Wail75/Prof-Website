@@ -6,13 +6,17 @@
 
 <h3 id="quiz-name"><%=l('Quiz: ') . $selected_quiz_name%></h3>
 
+% if ($selected_quiz_average_grade) {
+  <p><%=l('Your average score for this quiz:')%> <%=$selected_quiz_average_grade%>%.</p>
+% }
+
     % if ($last_response_quiz_type && $last_response_quiz_type eq 'whole-quiz') {
       %= include 'common/_response_result'
     % }
 
     % if ($item_id) {
 
-<p id='question-asked'><%=l('Question:') . ' '%><span id="question" class="question"><%=$question%></span></p>
+<p id='question-asked'><%=l('Question:') . ' '%><span id="question" class="question"><%=$question%></span> (<%= defined $average_grade ? l('your average score:') . " $average_grade%" : 'no answer yet'%>)</p>
 <p><%=l('Your answer')%></p>
 <p>
 %= form_for 'respond_question' => begin
@@ -27,10 +31,12 @@
 
     % } else {
 
-<p><%=l('No item for this quiz.')%></p>
+<p id="do-quiz-no-item"><%=l('No item for this quiz.')%></p>
 
     % }
 
+% } elsif (@$quizs) {
+<p id="do-quiz-no-item"><%=l('No item for this quiz.')%></p>
 % } else {
-<p><%=l('No quiz found.')%></p>
+<p id="do-quiz-no-quiz"><%=l('No quiz found.')%> <%=l('Start by authoring one.')%></p>
 % }

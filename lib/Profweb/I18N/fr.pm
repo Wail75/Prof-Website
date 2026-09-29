@@ -267,6 +267,10 @@ our %Lexicon = (
   'Quiz update failed.'                                         => "Échec de la mise à jour du quiz.",
   'Quiz not found.'                                             => "Le quiz n'a pas été trouvé.",
   'No quiz found.'                                              => "Aucun quiz trouvé.",
+  'no answer yet'                                               => "pas encore de réponse",
+  'Your average score:'                                         => "Votre score moyen :",
+  'Your average score for this quiz:'                           => "Votre score moyen pour ce quiz :",
+  'your average score:'                                         => "votre score moyen :",
   'To get more questions, please create an account and log in.' =>
     "Pour avoir plus de questions, veuillez créer un compte utilisateur et vous connecter.",
   'Direct link to this quiz.' => "Lien direct vers ce quiz.",
