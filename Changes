@@ -1,3 +1,8 @@
+1.00  2026-09-29
+    add a button for deleting user account
+    better UI and corrections
+    reorganized dashboard with a Single Question bloc over all quizzes and a Do Quiz bloc for a specific quiz
+    add some user information on his average questions and quizs grades; tests
 
 0.94  2026-09-11
   - fixes after HTTP security header, remove a call to a font file and remove inline CSS
@@ -16,7 +21,6 @@
   - added a charset to the default layout
   - removed a useless level in t/ to simplify the structure and avoid a renaming when adapting blank
   - added a BEFORE_RELEASE help file
-
 
 0.90  2026-08-12
   - First release, not yet 1.0 in case some serious flaws appear.
