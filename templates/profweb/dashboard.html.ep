@@ -11,10 +11,12 @@
 
 %= include 'common/_notifications'
 
-<div id="single-question" class="row bloc">
-  <h2 id="single-question"><%=l('Single Question')%></h2>
-  %= include 'common/_single_question'
-</div>
+% if ($single_item_id && $single_question) {
+    <div id="single-question" class="row bloc">
+      <h2 id="single-question"><%=l('Single Question')%></h2>
+      %= include 'common/_single_question'
+    </div>
+% }
 
 <div id="author" class="row bloc">
   <h2 id="author"><%= link_to author_index => begin %><%=l('Quiz Authoring')%><%end%></h2>
@@ -28,16 +30,16 @@
 
       %= include 'common/_do_quiz'
 
-      %= form_for 'dashboard', method => 'POST' => begin
+      %= form_for 'dashboard', method => 'POST', id => 'do-quiz-select' => begin
           %= csrf_field
           %= label_for selected_quiz => l('Select the quiz you want to do')
           %# prepare a list of selection options quiz_name => quiz id, with the session selected quiz if any
-          %= select_field selected_quiz => [map {[$_->{name} => $_->{id}, ( $selected_quiz_name && $selected_quiz_name eq $_->{name} ? ('selected' => '') : ()) ]} @$quizs], id => 'selected_quiz'
+          %= select_field selected_quiz => [map {[$_->{name} . ' (' . ($_->{average_grade} || 0) . '%)' => $_->{id}, ( $selected_quiz_name && $selected_quiz_name eq $_->{name} ? ('selected' => '') : ()) ]} @$quizs], id => 'selected_quiz'
           %= submit_button l('Select')
       %= end
 
   % } else {
-      <p><%=l('You have no quiz yet.')%> <%=l('Start by authoring one.')%></p>
+      <p id="do-quiz-select-no-quiz"><%=l('You have no quiz yet.')%> <%=l('Start by authoring one.')%></p>
   % }
 
 </div>

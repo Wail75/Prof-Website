@@ -172,6 +172,9 @@ This library has not been designed for thread safety.
 
 my $MAX_GRADE = 100;
 
+my $refresh_stats_items_query = 'REFRESH MATERIALIZED VIEW stats_items';
+my $refresh_stats_quizs_query = 'REFRESH MATERIALIZED VIEW stats_quizs';
+
 # return a formatted error message for DB failures
 sub _db_error_str {
   my ($self, $error, $query, @params) = @_;
@@ -272,13 +275,14 @@ sub next_question {
   # we take advantage of the bare colum 'results.item_id' to sort first items that don't have any
   # result (the NULL value in results.item_id makes it sort first)
   my $query = <<"EOS";
-SELECT items.id, items.question
+SELECT items.id, items.question, stats_items.average_grade
 FROM items
     JOIN quiz_item_links ON items.id = quiz_item_links.item_id
     JOIN quizs ON quiz_item_links.quiz_id = quizs.id
     LEFT JOIN results ON items.id = results.item_id
+    LEFT JOIN stats_items ON items.id = stats_items.item_id
 WHERE quiz_item_links.quiz_id = \$1 AND (quizs.visible = 'public' OR quizs.user_id = \$2)
-GROUP BY items.id, results.item_id, quiz_item_links.rank
+GROUP BY items.id, results.item_id, quiz_item_links.rank, stats_items.average_grade
 -- multiply by 10 so that there is distinction even at a low count of results
 -- NULLS FIRST because if no result, the expression value is NULL
 ORDER BY (10 * COUNT(*) + 20 * AVG(results.grade) / ${MAX_GRADE}::REAL * COUNT(*)) ASC NULLS FIRST,
@@ -294,12 +298,12 @@ EOS
   if ($res->rv < 1) {
     return (status => 0, msg => "Could not find an item for quiz id '$quiz_id'.");
   }
-  my ($item_id, $question) = @{$res->array};
+  my ($item_id, $question, $average_grade) = @{$res->array};
   if (!$item_id) {
     return (status => 0, msg => "Could not find an item for quiz id '$quiz_id'.");
   }
 
-  return (status => 1, item_id => $item_id, question => $question);
+  return (status => 1, item_id => $item_id, question => $question, average_grade => $average_grade);
 }
 
 # get a single question from the user's own quizs, with the priority formula
@@ -318,13 +322,14 @@ sub single_question {
   # result (the NULL value in results.item_id makes it sort first)
   # NOTE keep in sync with the priority formula from sub next_question
   my $query = <<"EOS";
-SELECT items.id, items.question, quizs.name
+SELECT items.id, items.question, quizs.name, stats_items.average_grade
 FROM items
     JOIN quiz_item_links ON items.id = quiz_item_links.item_id
     JOIN quizs ON quiz_item_links.quiz_id = quizs.id
     LEFT JOIN results ON items.id = results.item_id
+    LEFT JOIN stats_items ON items.id = stats_items.item_id
 WHERE quizs.user_id = \$1
-GROUP BY items.id, results.item_id, quiz_item_links.rank, quizs.name
+GROUP BY items.id, results.item_id, quiz_item_links.rank, quizs.name, stats_items.average_grade
 -- multiply by 10 so that there is distinction even at a low count of results
 -- NULLS FIRST because if no result, the expression value is NULL
 ORDER BY (10 * COUNT(*) + 20 * AVG(results.grade) / ${MAX_GRADE}::REAL * COUNT(*)) ASC NULLS FIRST,
@@ -339,12 +344,18 @@ EOS
   if ($res->rv < 1) {
     return (status => 0, msg => "Could not find an item.");
   }
-  my ($item_id, $question, $quiz_name) = @{$res->array};
+  my ($item_id, $question, $quiz_name, $average_grade) = @{$res->array};
   if (!$item_id) {
     return (status => 0, msg => "Could not find an item.");
   }
 
-  return (status => 1, item_id => $item_id, question => $question, quiz_name => $quiz_name);
+  return (
+    status        => 1,
+    item_id       => $item_id,
+    question      => $question,
+    quiz_name     => $quiz_name,
+    average_grade => $average_grade
+  );
 }
 
 # compares two strings but before using eq, this subroutine does the following:
@@ -396,6 +407,10 @@ EOS
     eval { $res = $self->pg->db->query($query, @params); 1 } or do { die $self->_db_error_str($@, $query, @params) };
     $log->warn("Failed to save result for item id '$item_id'.") unless $res->rv > 0;
   }
+  eval { $res = $self->pg->db->query($refresh_stats_items_query); 1 }
+    or do { die $self->_db_error_str($@, $refresh_stats_items_query) };
+  eval { $res = $self->pg->db->query($refresh_stats_quizs_query); 1 }
+    or do { die $self->_db_error_str($@, $refresh_stats_quizs_query) };
 
   return (status => 1, grade => $grade);
 }
@@ -473,11 +488,22 @@ sub get_quizzes_infos {
     return (status => 0, msg => "Parameter incorrect: $key");
   }
 
-  my $query  = 'SELECT id, name, description, instructions, visible FROM quizs';
+  # remove some ambiguity
+  if (exists $pars{user_id}) { $pars{'quizs.user_id'} = $pars{user_id}; delete $pars{user_id} }
+  if (exists $pars{id})      { $pars{'quizs.id'}      = $pars{id};      delete $pars{id} }
+
+  my $query = <<EOS;
+SELECT quizs.id, name, description, instructions, visible, stats_quizs.average_grade
+FROM quizs
+  LEFT JOIN stats_quizs ON quizs.id = stats_quizs.quiz_id
+EOS
   my @params = ();
   if (%pars) {
     my @conditions = map {"$_ = ?"} keys %pars;
-    $query .= ' WHERE ' . join(' AND ', @conditions);
+    $query .= "\nWHERE " . join(' AND ', @conditions);
+
+    # show the last created quiz first
+    $query .= "\nORDER BY quizs.id DESC";
     @params = values %pars;
   }
   my $res;
@@ -749,10 +775,19 @@ sub delete_item {
 # - item_id: an integer, the id of the item if success
 sub create_item {
   my ($self, $user_id, $question, $answer) = @_;
+  my $item_id;
 
-  my $query  = 'INSERT INTO items (user_id, question, answer) VALUES ($1, $2, $3)';
+  # NOTE maybe do better, with a single request?
+  # try to find the item first
+  my $query  = 'SELECT id FROM items WHERE user_id = $1 AND question = $2 AND answer = $3';
   my @params = ($user_id, $question, $answer);
   my $res;
+  eval { $res = $self->pg->db->query($query, @params); 1 } or do { die $self->_db_error_str($@, $query, @params) };
+
+  return (status => 1, item_id => $res->array->[0]) if $res->rv >= 1;
+
+  $query  = 'INSERT INTO items (user_id, question, answer) VALUES ($1, $2, $3)';
+  @params = ($user_id, $question, $answer);
   eval { $res = $self->pg->db->query($query, @params); 1 } or do { die $self->_db_error_str($@, $query, @params) };
 
   if ($res->rv > 1) {
@@ -769,12 +804,10 @@ sub create_item {
   $query  = 'SELECT id FROM items WHERE user_id = $1 AND question = $2 AND answer = $3';
   @params = ($user_id, $question, $answer);
   eval { $res = $self->pg->db->query($query, @params); 1 } or do { die $self->_db_error_str($@, $query, @params) };
-  die 'item not found after creation' unless $res->rv > 0;
-  my $item_id = $res->array->[0];
+  die 'item not found after creation' unless $res->rv >= 1;
 
-  # $log->debug("Created item id $item_id for question '$question'.");
+  return (status => 1, item_id => $res->array->[0]);
 
-  return (status => 1, item_id => $item_id);
 }
 
 # add an item to a quiz
@@ -999,8 +1032,10 @@ sub session_next_question {
   my ($self, $user_id, $session_id) = @_;
 
   my $query = <<'EOS';
-SELECT items.id, items.question
-FROM items JOIN sessions ON sessions.next_item_id = items.id
+SELECT items.id, items.question, stats_items.average_grade
+FROM items
+  JOIN sessions ON sessions.next_item_id = items.id
+  LEFT JOIN stats_items ON items.id = stats_items.item_id
 WHERE sessions.user_id = $1 AND sessions.id = $2
 EOS
   my @params = ($user_id, $session_id);
@@ -1087,6 +1122,10 @@ EOS
   elsif ($res->rv == 0) {
     return (status => 0, msg => "Response not registered in session id '$session_id'.");
   }
+  eval { $res = $self->pg->db->query($refresh_stats_items_query); 1 }
+    or do { die $self->_db_error_str($@, $refresh_stats_items_query) };
+  eval { $res = $self->pg->db->query($refresh_stats_quizs_query); 1 }
+    or do { die $self->_db_error_str($@, $refresh_stats_quizs_query) };
 
   return (status => 1, grade => $grade);
 }

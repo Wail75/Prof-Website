@@ -33,6 +33,9 @@ FEATURES
     goes to the new item question text input field. Thus you should be able
     to enter quiz items and answer questions with your keyboard only.
 
+    When a quiz or a question is shown to the user, his average score is
+    displayed (as a percentage of correct answers).
+
     When editing a quiz item, the answer field does not remember your input
     to avoid unnecessary clutter. Same thing with previous answers when
     doing a quiz.

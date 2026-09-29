@@ -29,7 +29,7 @@ sub dashboard {
 
   my %hres  = $c->prof->get_quizzes_infos(user_id => $user_id);
   my $quizs = $hres{status} ? $hres{quizzes} : [];
-  $log->debug("found " . @$quizs . " quizzes for user id $user_id");
+  $log->debug("found " . @$quizs . " quizzes for user id '$user_id'");
 
   # a newly selected quiz replaces the previously selected quiz
   my $v = $c->validation();
@@ -41,17 +41,18 @@ sub dashboard {
   }
 
   ## Single Question
-  my ($single_question_quiz, $single_item_id, $single_question, $single_quiz_name);
+  my ($single_question_quiz, $single_item_id, $single_question, $single_quiz_name, $single_average_grade);
   %hres = $c->prof->single_question($user_id);
   if (!$hres{status} || !$hres{item_id}) {
     $log->warn("failed to get single question '$hres{msg}'.");
   }
   else {
-    ($single_item_id, $single_question, $single_quiz_name) = @hres{qw(item_id question quiz_name)};
+    ($single_item_id, $single_question, $single_quiz_name, $single_average_grade)
+      = @hres{qw(item_id question quiz_name average_grade)};
   }
 
   ## Do Quiz
-  my ($selected_quiz_name, $item_id, $question);
+  my ($selected_quiz_name, $selected_quiz_average_grade, $item_id, $question, $average_grade);
   if (@$quizs) {
 
     # there is no particular reason for taking the first quiz, it's like a random default quiz
@@ -61,28 +62,32 @@ sub dashboard {
     # find the selected quiz name in the list
     my @qs   = grep { $_->{id} == $c->session('selected_quiz') } @$quizs;
     my $quiz = shift @qs;
-    $selected_quiz_name = $quiz->{name};
+    $selected_quiz_name          = $quiz->{name};
+    $selected_quiz_average_grade = $quiz->{average_grade};
 
     %hres = $c->prof->next_question($user_id, $c->session('selected_quiz'));
     if (!$hres{status} || !$hres{item_id}) {
       $log->warn("failed to get next question for quiz id '$quiz->{id}': '$hres{msg}'.");
     }
     else {
-      ($item_id, $question) = @hres{qw(item_id question)};
+      ($item_id, $question, $average_grade) = @hres{qw(item_id question average_grade)};
     }
   }
   $log->info("done.");
 
   return $c->render(
-    page_source             => $c->url_for,
-    last_response_quiz_type => $c->session('last_response_quiz_type') || '',
-    selected_quiz_name      => $selected_quiz_name,
-    item_id                 => $item_id,
-    question                => $question,
-    quizs                   => $quizs,
-    single_item_id          => $single_item_id,
-    single_question         => $single_question,
-    single_quiz_name        => $single_quiz_name
+    page_source                 => $c->url_for,
+    last_response_quiz_type     => $c->session('last_response_quiz_type') || '',
+    selected_quiz_name          => $selected_quiz_name,
+    selected_quiz_average_grade => $selected_quiz_average_grade,
+    item_id                     => $item_id,
+    question                    => $question,
+    average_grade               => $average_grade,
+    quizs                       => $quizs,
+    single_item_id              => $single_item_id,
+    single_question             => $single_question,
+    single_quiz_name            => $single_quiz_name,
+    single_average_grade        => $single_average_grade
   );
 }
 
@@ -99,25 +104,32 @@ sub do_quizs {
   my %hres = $c->prof->get_quizzes_infos(id => $quiz_id);
   return $c->flash(error => 'Quiz not found.')->redirect_to('do_quizs') unless $hres{status};
 
-  my $selected_quiz_name = $hres{quizzes}[0]{name};
+  my $quizs = $hres{status} ? $hres{quizzes} : [];
+  $log->debug("found " . @$quizs . " quizzes for quiz id '$quiz_id'");
+  my $quiz                        = $quizs->[0];
+  my $selected_quiz_name          = $quiz->{name};
+  my $selected_quiz_average_grade = $quiz->{average_grade};
 
-  my ($item_id, $question);
+  my ($item_id, $question, $average_grade);
   %hres = $c->prof->next_question($user_id, $quiz_id);
   if (!$hres{status} || !$hres{item_id}) {
     $log->warn("failed to get next question for quiz id '$quiz_id': '$hres{msg}'.");
   }
   else {
-    ($item_id, $question) = @hres{qw(item_id question)};
+    ($item_id, $question, $average_grade) = @hres{qw(item_id question average_grade)};
     $log->info("done.");
   }
 
   return $c->render(
-    page_source             => $c->url_for,
-    last_response_quiz_type => $c->session('last_response_quiz_type') || '',
-    selected_quiz_name      => $selected_quiz_name,
-    item_id                 => $item_id,
-    question                => $question,
-    quiz_id                 => $quiz_id
+    page_source                 => $c->url_for,
+    last_response_quiz_type     => $c->session('last_response_quiz_type') || '',
+    quizs                       => $quizs,
+    selected_quiz_name          => $selected_quiz_name,
+    selected_quiz_average_grade => $selected_quiz_average_grade,
+    item_id                     => $item_id,
+    question                    => $question,
+    average_grade               => $average_grade,
+    quiz_id                     => $quiz_id
   );
 }
 

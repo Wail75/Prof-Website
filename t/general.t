@@ -93,7 +93,12 @@ subtest 'Create a quiz' => sub {
     ->status_is(200)
     ->text_like('b' => qr/Login successful/);
 
-  $t->get_ok($dashboard_page)->status_is(200)->text_is('h2#author a' => 'Quiz Authoring');
+  $t->get_ok($dashboard_page)
+    ->status_is(200)
+    ->text_is('h2#author a' => 'Quiz Authoring')
+    ->text_like('p#do-quiz-select-no-quiz' => qr/no quiz yet/)
+    ->text_is('p#single-question-no-quiz' => undef)
+    ->text_is('p#do-quiz-no-quiz'         => undef);
 
   $t->get_ok($author_page)->status_is(200)->text_is('h1' => 'Authoring')->text_is('h3' => 'Create a quiz');
 
@@ -129,8 +134,14 @@ subtest 'Respond to a whole quiz' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_is('div#do-quiz h3#quiz-name'          => "Quiz: $quiz1_name")
-    ->text_is('div#do-quiz p#question-asked span' => $question1);
+    ->text_is('div#do-quiz h3#quiz-name' => "Quiz: $quiz1_name")
+    ->text_like('p#single-question-asked span' => qr/$question1/)
+    ->text_like('p#single-question-asked'      => qr/from the quiz $quiz1_name/)
+    ->text_like('p#single-question-asked'      => qr/no answer yet/)
+    ->text_is('div#do-quiz p#question-asked span' => $question1)
+    ->text_like('div#do-quiz p#question-asked' => qr/no answer yet/)
+    ->text_like('form#do-quiz-select option'   => qr/$quiz1_name \(0%\)/, '0% grade on first question no answer')
+    ->text_is('p#do-quiz-no-quiz' => undef);
 
   $item1_id = $t->tx->res->dom->at('div#single-question input[name=item_id]')->attr('value');
 
@@ -144,6 +155,12 @@ subtest 'Respond to a whole quiz' => sub {
     }
   )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
 
+  $t->get_ok($dashboard_page)
+    ->status_is(200)
+    ->text_like('p#single-question-asked'      => qr/your average score: 100%/)
+    ->text_like('div#do-quiz p#question-asked' => qr/your average score: 100%/)
+    ->text_like('form#do-quiz-select option'   => qr/$quiz1_name \(100%\)/, '100% grade after first good response');
+
   $t->get_ok(
     $respond_page => form => {
       csrf($dashboard_page),
@@ -156,7 +173,8 @@ subtest 'Respond to a whole quiz' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz1_name/)
+    ->text_like('p#single-question-asked'      => qr/your average score: 50%/)
+    ->text_like('div#do-quiz p#question-asked' => qr/your average score: 50%/)
     ->text_is('div#single-question span#question' => $question1);
 
   # add another question, it should be the next Single Question
@@ -172,7 +190,7 @@ subtest 'Respond to a whole quiz' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz1_name/)
+    ->text_like('p#single-question-asked' => qr/no answer yet/)
     ->text_is('div#single-question span#question' => $question2);
 
   $item2_id = $t->tx->res->dom->at('div#single-question input[name=item_id]')->attr('value');
@@ -190,8 +208,12 @@ subtest 'Respond to a whole quiz' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz1_name/)
-    ->text_is('div#single-question span#question' => $question2);
+    ->text_like('div#single-question p#single-question-asked' => qr/from the quiz $quiz1_name/)
+    ->text_like('p#single-question-asked'                     => qr/your average score: 100%/)
+    ->text_is('div#single-question span#question'          => $question2)
+    ->text_is('div#do-quiz p#question-asked span#question' => $question2)
+    ->text_like('div#do-quiz p#question-asked' => qr/your average score: 100%/)
+    ->text_like('form#do-quiz-select option'   => qr/$quiz1_name \(67%\)/);
 
   $t->get_ok(
     $respond_page => form => {
@@ -205,7 +227,7 @@ subtest 'Respond to a whole quiz' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz1_name/)
+    ->text_like('div#single-question p#single-question-asked' => qr/from the quiz $quiz1_name/)
     ->text_is('div#single-question span#question' => $question1);
 
   $t->get_ok($logout_page)->status_is(200);
@@ -237,13 +259,13 @@ subtest 'Adding a second quiz' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
-    ->text_like('div#single-question p#question-asked' => qr/from the quiz $quiz2_name/)
-    ->text_is('div#single-question span#question' => $question3);
-
-  $t->get_ok($dashboard_page)
-    ->status_is(200)
-    ->text_is('div#do-quiz h3#quiz-name'          => "Quiz: $quiz2_name")
-    ->text_is('div#do-quiz p#question-asked span' => $question3);
+    ->text_like('div#single-question p#single-question-asked' => qr/from the quiz $quiz2_name/)
+    ->text_is('div#single-question span#question' => $question3)
+    ->text_like('p#single-question-asked' => qr/no answer yet/)
+    ->text_is('div#do-quiz h3#quiz-name' => "Quiz: $quiz2_name", 'new quiz appears first')
+    ->text_like('div#do-quiz p#question-asked' => qr/no answer yet/)
+    ->text_like('form#do-quiz-select option'   => qr/$quiz2_name \(0%\)/)
+    ->text_is('div#do-quiz p#question-asked span' => $question3, 'question from new quiz');
 
 
   $t->get_ok($logout_page)->status_is(200);

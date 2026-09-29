@@ -1,0 +1,2 @@
+DROP MATERIALIZED VIEW stats_items;
+DROP MATERIALIZED VIEW stats_quizs;

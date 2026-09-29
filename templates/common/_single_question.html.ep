@@ -12,11 +12,12 @@
 
     % if ($single_item_id) {
 
-<p id='question-asked'>
+<p id='single-question-asked'>
   <%=l('Question:') . ' '%><span id="question" class="question"><%=$single_question%></span>
       % if ($single_quiz_name) {
   <%=l('from the quiz')%> <%=$single_quiz_name%>
       % }
+      %= '(' . (defined $single_average_grade ? l('your average score:') . " $single_average_grade%" : l('no answer yet')) . ')';
 </p>
 <p><%=l('Your answer')%></p>
 <p>
@@ -32,10 +33,8 @@
 
     % } else {
 
-<p><%=l('No item for this quiz.')%></p>
+<p id="single-question-no-item"><%=l('No item for this quiz.')%></p>
 
     % }
 
-% } else {
-<p><%=l('No quiz found.')%></p>
 % }
