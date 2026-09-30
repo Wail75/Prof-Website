@@ -16,7 +16,7 @@
 
     % if ($item_id) {
 
-<p id='question-asked'><%=l('Question:') . ' '%><span id="question" class="question"><%=$question%></span> (<%= defined $average_grade ? l('your average score:') . " $average_grade%" : 'no answer yet'%>)</p>
+<p id='question-asked'><%=l('Question:') . ' '%><span id="question" class="question"><%=$question%></span> (<%= defined $average_grade ? l('your average score:') . " $average_grade%" : l('no answer yet')%>)</p>
 <p><%=l('Your answer')%></p>
 <p>
 %= form_for 'respond_question' => begin
