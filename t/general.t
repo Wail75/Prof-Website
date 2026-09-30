@@ -143,6 +143,12 @@ subtest 'Respond to a whole quiz' => sub {
     ->text_like('form#do-quiz-select option'   => qr/$quiz1_name \(0%\)/, '0% grade on first question no answer')
     ->text_is('p#do-quiz-no-quiz' => undef);
 
+  # check translations
+  $t->get_ok($dashboard_page => {'Accept-Language' => 'fr'})
+    ->status_is(200)
+    ->text_like('p#single-question-asked'      => qr/pas encore de réponse/)
+    ->text_like('div#do-quiz p#question-asked' => qr/pas encore de réponse/);
+
   $item1_id = $t->tx->res->dom->at('div#single-question input[name=item_id]')->attr('value');
 
   $t->get_ok(
