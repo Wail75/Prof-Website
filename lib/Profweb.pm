@@ -105,14 +105,17 @@ sub make_pg_connec_string_from_conf {
 sub startup {
   my ($self) = shift;
 
-  # security headers
+  # HTTP headers
   $self->hook(
     before_dispatch => sub ($c) {
+      # security headers
       $c->res->headers->header('X-Frame-Options'           => 'DENY');
       $c->res->headers->header('X-Content-Type-Options'    => 'nosniff');
       $c->res->headers->header('Strict-Transport-Security' => 'max-age=3600');
       $c->res->headers->header(
         'Content-Security-Policy' => "default-src 'self'; frame-ancestors 'self'; form-action 'self';");
+      # to avoid a CSRF token error on a page opened for long
+      $c->res->headers->header('Cache-Control' => "max-age=" . $self->sessions->default_expiration);
     }
   );
 
