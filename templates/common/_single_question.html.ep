@@ -26,7 +26,8 @@
     %= hidden_field page_source => $page_source
     %= hidden_field quiz_type => 'single-question'
     %= hidden_field item_id => $single_item_id
-    %= text_area 'response', cols => 40, rows => 3, class => 'large-text', autofocus => '', autocomplete => 'off'
+    %# 33 cols is adjusted for mobile
+    %= text_area 'response', cols => 33, rows => 3, class => 'large-text', autofocus => '', autocomplete => 'off'
     %= submit_button l('Send')
 %= end
 </p>
