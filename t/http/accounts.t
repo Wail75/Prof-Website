@@ -244,7 +244,7 @@ subtest 'Add an email address to a registration with name only' => sub {
 
   $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})->status_is(200);
 
-  $t->get_ok($account_page)->status_is(200)->text_like('p#email-change', qr/You can give a new account email here/);
+  $t->get_ok($account_page)->status_is(200)->text_like('div#email-change p label', qr/New email/);
 
   $t->post_ok($ask_email_change => form => {csrf($account_page), 'new-email' => $email2})
     ->status_is(200)
@@ -293,7 +293,7 @@ subtest 'Change an email address' => sub {
   $t->get_ok($account_page)
     ->status_is(200)
     ->text_like('p#email-notif' => qr/Your email address is $email2/)
-    ->text_like('p#email-change', qr/You can give a new account email here/);
+    ->text_like('div#email-change p label', qr/New email/);
 
   $t->post_ok($ask_email_change => form => {csrf($account_page), 'new-email' => $email3})
     ->status_is(200)
@@ -337,7 +337,7 @@ subtest 'Change a password' => sub {
 
   $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})->status_is(200);
 
-  $t->get_ok($account_page)->status_is(200)->text_like('p#password-change label', qr/You can give a new password/);
+  $t->get_ok($account_page)->status_is(200)->text_like('p#password-change label', qr/New password/);
 
   $t->post_ok($modify_account_password => form => {'new-pwd1' => $pwd2, 'new-pwd2' => $pwd2, 'current-pwd' => $pwd})
     ->status_is(200)
