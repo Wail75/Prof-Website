@@ -84,6 +84,9 @@ subtest 'Basic dashboard features' => sub {
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
+    ->text_is('div#top-bar p#account-name a#author_index_link', 'Authoring', 'connected top bar authoring')
+    ->text_is('div#top-bar p#account-name a#dashboard_link', 'Dashboard', 'connected top bar dashboard')
+    ->text_is('div#top-bar p#account-name a#account_link', 'My Account', 'connected top bar account')
     ->text_like('h1'          => qr/Dashboard/)
     ->text_like('h2#author a' => qr/Quiz Authoring/)
     ->attr_is('a#author', 'href', '/author', 'link to the authoring page')
