@@ -137,7 +137,7 @@ our %Lexicon = (
   'Check your email inbox and your spams.'  => "Vérifiez votre boîte email et vos spams.",
   'Once you have the verification email, click the link inside it to verify your email address.' =>
     "Une fois que vous avez reçu l'email de vérification, cliquez sur le lien qu'il contient pour confirmer votre adresse email.",
-  'To send the verification email again, click on this link' =>
+  'To send the verification email again, click on this link.' =>
     "Pour recevoir à nouveau l'email de vérification, cliquez sur ce lien.",
   'The email verification link is incorrect.'          => "Le lien pour vérifier l'adresse email n'est pas correct.",
   'Your email address has been successfully verified.' => "Votre adresse email a bien été confirmée.",

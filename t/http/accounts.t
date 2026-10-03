@@ -244,7 +244,7 @@ subtest 'Add an email address to a registration with name only' => sub {
 
   $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})->status_is(200);
 
-  $t->get_ok($account_page)->status_is(200)->text_like('div#email-change p label', qr/New email/);
+  $t->get_ok($account_page)->status_is(200)->text_like('div#email-change form label', qr/New email/);
 
   $t->post_ok($ask_email_change => form => {csrf($account_page), 'new-email' => $email2})
     ->status_is(200)
@@ -293,7 +293,7 @@ subtest 'Change an email address' => sub {
   $t->get_ok($account_page)
     ->status_is(200)
     ->text_like('p#email-notif' => qr/Your email address is $email2/)
-    ->text_like('div#email-change p label', qr/New email/);
+    ->text_like('div#email-change form label', qr/New email/);
 
   $t->post_ok($ask_email_change => form => {csrf($account_page), 'new-email' => $email3})
     ->status_is(200)
@@ -337,7 +337,7 @@ subtest 'Change a password' => sub {
 
   $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})->status_is(200);
 
-  $t->get_ok($account_page)->status_is(200)->text_like('p#password-change label', qr/New password/);
+  $t->get_ok($account_page)->status_is(200)->text_like('div#password-change label', qr/New password/);
 
   $t->post_ok($modify_account_password => form => {'new-pwd1' => $pwd2, 'new-pwd2' => $pwd2, 'current-pwd' => $pwd})
     ->status_is(200)
@@ -625,8 +625,9 @@ subtest 'Delete user' => sub {
 
   $t->get_ok($account_page)
     ->status_is(200)
-    ->text_like('p#user-delete', qr/You can delete your entire user account/, 'delete user account')
-    ->attr_like('p#user-delete input', 'value', qr/Delete your entire user account/, 'button to delete user account');
+    ->text_like('div#user-delete form', qr/You can delete your entire user account/, 'delete user account')
+    ->attr_like('div#user-delete input[type=submit]', 'value', qr/Delete your entire user account/,
+      'button to delete user account');
 
   $t->post_ok($delete_user => form => {})
     ->status_is(200)
