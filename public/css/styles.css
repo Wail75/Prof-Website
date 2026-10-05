@@ -1,3 +1,15 @@
+/* to correct an autozoom problem with Safari when font size < 16px */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea {
+    font-size: 1.6rem
+}
+
 .error {
     color: red
 }
