@@ -1,3 +1,10 @@
+1.03  2026-10-05
+  - remove a directive that seemed to have only caused navigation errors
+  - redirect to Dashboard after registering
+  - add an Open Source repository link
+  - improvements and corrections to the Index page UI
+  - quick fix for a problem with Safari autozooming input text
+
 1.02  2026-10-05
   - better UI for the Quiz authoring page
   - better UI for the account management page
