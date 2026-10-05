@@ -626,8 +626,12 @@ subtest 'Delete user' => sub {
   $t->get_ok($account_page)
     ->status_is(200)
     ->text_like('div#user-delete form', qr/You can delete your entire user account/, 'delete user account')
-    ->attr_like('div#user-delete input[type=submit]', 'value', qr/Delete your entire user account/,
-      'button to delete user account');
+    ->attr_like(
+    'div#user-delete input[type=submit]',
+    'value',
+    qr/Delete your entire user account/,
+    'button to delete user account'
+    );
 
   $t->post_ok($delete_user => form => {})
     ->status_is(200)
