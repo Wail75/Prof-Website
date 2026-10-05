@@ -103,7 +103,7 @@ sub register {
 
   if (!$err) {
     $c->flash(message => $msg) if $msg;
-    $c->redirect_to('account');
+    $c->redirect_to('dashboard');
   }
   else {
     $c->flash(error => $err);
