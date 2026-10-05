@@ -28,9 +28,10 @@ our %Lexicon = (
     "De nouvelles fonctionnalités arriveront plus tard, n'hésitez pas à nous faire des retours.",
   'I am actively using this website to help me learn!' =>
     "J'utilise ce site web régulièrement pour m'aider à apprendre!",
-  'Open source'                             => "Logiciel libre",
-  'This website is an Open Source project.' => "Ce site web est un projet logiciel libre (Open Source).",
-  'Privacy First'                           => "Priorité à la Confidentialité",
+  'Open source'                                   => "Logiciel libre",
+  'This website is an Open Source project.'       => "Ce site web est un projet logiciel libre (Open Source).",
+  'You can read, modify and copy the code there.' => "Vous pouvez lire, modifier et copier le code là.",
+  'Privacy First'                                 => "Priorité à la Confidentialité",
   'All data collected by this website only serves the functioning of this service.' =>
     "Les données collectées par ce site web servent uniquement au fonctionnement de ce service.",
   'No data is shared with third parties.'               => "Aucune donnée n'est communiquée à des tiers.",
