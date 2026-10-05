@@ -31,8 +31,8 @@ our %Lexicon = (
   'Open source'                             => "Logiciel libre",
   'This website is an Open Source project.' => "Ce site web est un projet logiciel libre (Open Source).",
   'Privacy First'                           => "Priorité à la Confidentialité",
-  'All data collected by this website only serves the functioning of the quizzes.' =>
-    "Les données collectées par ce site web servent uniquement au foncitonnement des quizs.",
+  'All data collected by this website only serves the functioning of this service.' =>
+    "Les données collectées par ce site web servent uniquement au fonctionnement de ce service.",
   'No data is shared with third parties.'               => "Aucune donnée n'est communiquée à des tiers.",
   'We collect just the minimum to make this site work.' =>
     "Nous ne collectons que le minimum pour faire fonctionner ce site.",
@@ -95,9 +95,11 @@ our %Lexicon = (
 
   'Account Management' => "Gestion du compte utilisateur",
 
-  'Register'                                       => "Inscription",
-  'Name'                                           => "Nom d'utilisateur",
-  'Password'                                       => "Mot de passe",
+  'Register' => "Inscription",
+  'Name'     => "Nom d'utilisateur",
+  'Password' => "Mot de passe",
+  "Password, between $V::V_MIN_PWD and $V::V_MAX_PWD characters long, at least one letter and one digit" =>
+    "Mot de passe, entre $V::V_MIN_PWD et $V::V_MAX_PWD caractères de long, au moins une lettre et un chiffre",
   'Email'                                          => "Adresse email",
   'Repeat password'                                => "Répéter le mot de passe",
   'OR'                                             => "OU",
