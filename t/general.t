@@ -120,8 +120,8 @@ subtest 'Create a quiz' => sub {
     )
     ->status_is(200)
     ->text_like('b#notif-ok' => qr/Item created/)
-    ->attr_is('td input[name=updated_question]', 'value', $question1)
-    ->attr_is('td input[name=updated_answer]',   'value', $answer1);
+    ->attr_is('input[name=updated_question]', 'value', $question1)
+    ->attr_is('input[name=updated_answer]',   'value', $answer1);
 
   $t->get_ok($logout_page)->status_is(200);
 };
@@ -251,7 +251,7 @@ subtest 'Adding a second quiz' => sub {
     ->text_like('b#notif-ok' => qr/Quiz created/)
     ->text_is('h4' => $quiz2_name);
 
-  $quiz2_id = $t->tx->res->dom->at("table#quiz-$quiz2_name input[name=quiz_id]")->attr('value');
+  $quiz2_id = $t->tx->res->dom->at("div#quiz-$quiz2_name input[name=quiz_id]")->attr('value');
 
   $t->post_ok(
     $add_item_page => form => {

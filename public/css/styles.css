@@ -36,3 +36,7 @@ span.question {
     padding: 2px 30px;
     border: 2px solid #bbb;
 }
+
+.inline {
+  display: inline
+}

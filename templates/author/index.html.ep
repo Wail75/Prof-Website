@@ -9,113 +9,123 @@
 
 %= include 'common/_notifications'
 
-<div class="row">
-  <h2><%= l('Manage quizzes') %></h2>
-  <h3><%= l('Create a quiz') %></h3>
-  %= form_for 'add_quiz' => begin
-      %= csrf_field
-      %= label_for new_quiz_name => l('Quiz name')
-      %= text_field 'new_quiz_name'
-      %= submit_button l("Save"), id => 'add_quiz'
-  % end
+<h2><%= l('Manage quizzes') %></h2>
+
+<div id="new-quiz">
+    <h3><%= l('Create a quiz') %></h3>
+    %= form_for 'add_quiz' => begin
+        %= csrf_field
+        %= label_for new_quiz_name => l('Quiz name')
+        %= text_field 'new_quiz_name'
+        %= submit_button l("Save"), id => 'add_quiz', class => "button-primary"
+    % end
 </div>
 
-<div class="row">
-  <h3><%= l('Quizzes list') %></h3>
-  % if (@$quizs) {
-      % foreach my $quiz (@$quizs) {
-          % my ($quiz_id, $quiz_name, $quiz_visibility) = ($quiz->{id}, $quiz->{name}, $quiz->{visible});
-      <h4><%= $quiz_name %></h4>
-      <table id="quiz-<%=$quiz_name%>">
-          <tr>
-          %= form_for 'update_quiz_name' => begin
-              %= csrf_field
-              %= hidden_field quiz_name_to_update => $quiz_name
-              <td>
-              %= text_field new_quiz_name => $quiz_name
-              </td>
-              <td>
-              %= submit_button l('Rename'), id => "update_quiz_name_$quiz_name"
-              </td>
-          %= end
-          %= form_for 'update_quiz' => begin
-              %= csrf_field
-              %= hidden_field quiz_id => $quiz_id
-              % my $new_visibility = $quiz_visibility eq 'private' ? 'public' : 'private';
-              %= hidden_field visible => $new_visibility
-              <td>
-              %= l(ucfirst($quiz_visibility) . ' quiz')
-              %= submit_button l("Make it $new_visibility"), id => "change_quiz_visibility_$quiz_name"
-              </td>
-          %= end
-          %= form_for 'delete_quiz' => begin
-              %= csrf_field
-              %= hidden_field quiz_name_to_delete => $quiz_name
-              <td>
-              %= submit_button l('Delete'), id => "delete_quiz_$quiz_name"
-              </td>
-          %= end
-          <!-- %= form_for 'quiz_visibility' => begin -->
-          <!--     %= csrf_field -->
-          <!--     %= hidden_field quiz_name => $quiz_name -->
-          <!--     <td> -->
-          <!--     %= l($quiz_visibility) -->
-          <!--     %= submit_button l('Make public'), id => "quiz_visibility_$quiz_name" -->
-          <!--     </td> -->
-          <!-- %= end -->
-          </tr>
-      </table>
+<div class="existing-quizzes">
 
-      <%= link_to url_for('do_quizs', 'author' => $user_id, 'quiz' => $quiz_id) => begin %><%=l('Direct link to this quiz.')%><%end%>
-      <table id="items-<%=$quiz_name%>">
-          <tr><th><%=l('Question')%></th><th><%=l('Answer')%></th><th><%=l('Actions')%></th></tr>
-          % foreach my $item (@{$quizs_to_items->{$quiz_name}}) {
-          <tr>
-              %= form_for 'update_item' => begin
-                  %= csrf_field
-                  %= hidden_field item_to_update => $item->{id}
-                  %= hidden_field old_question => $item->{question}
-                  %= hidden_field old_answer => $item->{answer}
-              <td>
-                  %= text_field updated_question => $item->{question}
-              </td>
-              <td>
-                  %= text_field updated_answer => $item->{answer}, autocomplete => 'off'
-              </td>
-              <td>
-                  %= submit_button l('Change'), id => "update_item_$item->{id}"
-              </td>
-              %= end
-              %= form_for 'delete_item' => begin
-                  %= csrf_field
-                  %= hidden_field item_to_delete => $item->{id}
-              <td>
-                  %= submit_button l('Delete'), id => "delete_item_$item->{id}"
-              %= end
-              </td>
+    <h3><%= l('Quizzes list') %></h3>
 
-          </tr>
-          % }
-      </table>
-      <table>
-          <tr><th><%=l('New question')%></th><th><%=l('New answer')%></th><th><%=l('Actions')%></th></tr>
-          <tr>
-              %= form_for 'add_new_item_to_quiz' => begin
-                  %= csrf_field
-                  %= hidden_field quiz_name => $quiz_name
-                  %= hidden_field quiz_id => $quiz_id
-                  %# give focus to this text field if this is the selected quiz
-                  % my @focus = (session('selected_quiz') && session('selected_quiz') eq $quiz_id) ? (autofocus => '') : ();
-              <td><%= text_area 'new_question', rows => 2, class => 'large-text', @focus %></td>
-              <td><%= text_area 'new_answer', rows => 2, class => 'large-text' %></td>
-              <td><%= submit_button l('Add new item to quiz'), id => "add_new_item_quiz_$quiz_name" %></td>
-              %= end
-          </tr>
-      </table>
-      % }
-  % } else {
-  <p><%= l('Create a quiz first.') %></p>
-  % }
+    % if (@$quizs) {
+        % foreach my $quiz (@$quizs) {
+            % my ($quiz_id, $quiz_name, $quiz_visibility) = ($quiz->{id}, $quiz->{name}, $quiz->{visible});
+    <div id="quiz-<%=$quiz_name%>">
+        <h4><%= $quiz_name %></h4>
+        <div class="row">
+            <div class="five columns">
+            %= form_for 'update_quiz_name' => begin
+                %= csrf_field
+                %= hidden_field quiz_name_to_update => $quiz_name
+                %= text_field new_quiz_name => $quiz_name
+                %= submit_button l('Rename'), id => "update_quiz_name_$quiz_name"
+            %= end
+            </div>
+            <div class="five columns">
+            %= form_for 'update_quiz' => begin
+                %= csrf_field
+                %= hidden_field quiz_id => $quiz_id
+                % my $new_visibility = $quiz_visibility eq 'private' ? 'public' : 'private';
+                %= hidden_field visible => $new_visibility
+                <span><%=l(ucfirst($quiz_visibility) . ' quiz')%></span>
+                %= submit_button l("Make it $new_visibility"), id => "change_quiz_visibility_$quiz_name"
+            %= end
+            </div>
+            <div class="two columns">
+            %= form_for 'delete_quiz' => begin
+                %= csrf_field
+                %= hidden_field quiz_name_to_delete => $quiz_name
+                %= submit_button l('Delete'), id => "delete_quiz_$quiz_name", class => 'button radical'
+            %= end
+            </div>
+        </div>
+    </div>
+
+    <p id="link_do_quiz_<%=$quiz_id%>">
+        <%= link_to url_for('do_quizs', 'author' => $user_id, 'quiz' => $quiz_id) => begin %><%=l('Direct link to this quiz.')%><%end%>
+    </p>
+
+    % foreach my $item (@{$quizs_to_items->{$quiz_name}}) {
+    <div id="item-<%=$item->{id}%>" class="row">
+        <div class="four columns">
+            %= form_for 'update_item', class => 'inline' => begin
+                %= csrf_field
+                %= hidden_field item_to_update => $item->{id}
+                %= hidden_field old_question => $item->{question}
+                %= hidden_field old_answer => $item->{answer}
+                %= label_for 'updated_question' => begin
+                    <%=l('Question')%>
+                % end
+                %= text_field updated_question => $item->{question}, class => 'u-full-width'
+        </div>
+        <div class="four columns">
+                %= label_for 'updated_answer' => begin
+                    <%=l('Answer')%>
+                % end
+                %= text_field updated_answer => $item->{answer}, autocomplete => 'off', class => 'u-full-width'
+        </div>
+        <div class="four columns">
+                %= label_for "update_item_$item->{id}" => begin
+                    %= l('Actions')
+                % end
+                %= submit_button l('Change'), id => "update_item_$item->{id}"
+            %= end
+            %= form_for 'delete_item', class => 'inline u-pull-right' => begin
+                %= csrf_field
+                %= hidden_field item_to_delete => $item->{id}
+                %= submit_button l('Delete'), id => "delete_item_$item->{id}", class => 'button radical'
+            %= end
+        </div>
+    </div>
+    % }
+
+    <div id="new-item-quiz-<%=$quiz_id%>" class="row">
+        <div class="four columns">
+            %= form_for 'add_new_item_to_quiz' => begin
+                %= csrf_field
+                %= hidden_field quiz_name => $quiz_name
+                %= hidden_field quiz_id => $quiz_id
+                %# give focus to this text field if this is the selected quiz
+                % my @focus = (session('selected_quiz') && session('selected_quiz') eq $quiz_id) ? (autofocus => '') : ();
+                %= label_for 'new_question' => l('New question')
+                %= text_area 'new_question', class => 'u-full-width large-text', @focus
+        </div>
+        <div class="four columns">
+                %= label_for 'new_answer' => l('New answer')
+                %= text_area 'new_answer', rows => 2, class => 'u-full-width large-text'
+        </div>
+        <div class="four columns">
+                %= label_for "add_new_item_quiz_$quiz_name" => l('Actions')
+                %= submit_button l('Add new item to quiz'), id => "add_new_item_quiz_$quiz_name", class => 'u-full-width'
+            %= end
+        </div>
+    </div>
+        % }
+
+    % } else {
+
+        <p id="no-quiz-help"><%= l('Create a quiz first.') %></p>
+
+    % }
+
 </div>
 
 </div>
