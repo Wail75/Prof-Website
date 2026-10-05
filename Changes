@@ -1,11 +1,18 @@
+1.02  2026-10-05
+  - better UI for the Quiz authoring page
+  - better UI for the account management page
+  - add Authoring link to connected top bar
+  - limit cache duration and force refresh by the time the session ends to avoid CSRF token errors
+    when returning to the website after a long time
+
 1.01  2026-09-30
-    fix missing translation
+  - fix missing translation
 
 1.00  2026-09-29
-    add a button for deleting user account
-    better UI and corrections
-    reorganized dashboard with a Single Question bloc over all quizzes and a Do Quiz bloc for a specific quiz
-    add some user information on his average questions and quizs grades; tests
+  - add a button for deleting user account
+  - better UI and corrections
+  - reorganized dashboard with a Single Question bloc over all quizzes and a Do Quiz bloc for a specific quiz
+  - add some user information on his average questions and quizs grades; tests
 
 0.94  2026-09-11
   - fixes after HTTP security header, remove a call to a font file and remove inline CSS
