@@ -23,6 +23,12 @@ textarea {
     background-color: red
 }
 
+.no-autoedit {
+  autocorrect: off;
+  autocapitalize: off;
+  autocomplete: off
+}
+
 #top-bar {
     margin-top: 02%
 }
