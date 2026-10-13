@@ -25,7 +25,7 @@
     %= hidden_field quiz_type => 'whole-quiz'
     %= hidden_field item_id => $item_id
     %# 33 cols is adjusted for mobile
-    %= text_area 'response', cols => 33, rows => 3, class => 'large-text', autofocus => '', autocomplete => 'off'
+    %= text_area 'response', rows => 3, class => 'large-text u-full-width', autofocus => '', autocomplete => 'off'
     %= submit_button l('Send')
 %= end
 </p>
