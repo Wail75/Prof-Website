@@ -16,7 +16,7 @@ sudo apt install postgresql-16 postgresql-client postgresql-server-dev-all
 adduser devpg
 su - postgres / sudo -i -u postgres
 createuser --pwprompt devpg
-createdb -O devpg profweb TEST-profweb
+createdb -O devpg -E UTF8 profweb TEST-profweb
 # DON'T FORGET to run the migrations later (see below)
 
 carton install
