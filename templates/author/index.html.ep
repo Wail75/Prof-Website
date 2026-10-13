@@ -80,7 +80,7 @@
                 %= label_for 'updated_answer' => begin
                     <%=l('Answer')%>
                 % end
-                %= text_field updated_answer => $item->{answer}, autocomplete => 'off', class => 'u-full-width'
+                %= text_field updated_answer => $item->{answer}, autocomplete => 'off', class => 'u-full-width no-autoedit'
         </div>
         <div class="four columns">
                 %= label_for "update_item_$item->{id}" => begin
@@ -110,7 +110,7 @@
         </div>
         <div class="four columns">
                 %= label_for 'new_answer' => l('New answer')
-                %= text_area 'new_answer', rows => 2, class => 'u-full-width large-text'
+                %= text_area 'new_answer', rows => 2, class => 'u-full-width large-text no-autoedit'
         </div>
         <div class="four columns">
                 %= label_for "add_new_item_quiz_$quiz_name" => l('Actions')

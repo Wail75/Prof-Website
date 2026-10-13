@@ -31,7 +31,7 @@
                 </b>
                 % }
             % end
-            <%= text_field 'new-name' => flash('prev_name_change_new-name') %>
+            <%= text_field 'new-name' => flash('prev_name_change_new-name'), class => 'no-autoedit' %>
             <%= submit_button l('Save the new name'), class => 'button-primary' %>
         % end
     </div>

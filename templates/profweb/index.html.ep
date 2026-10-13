@@ -34,7 +34,7 @@
         %= form_for login => begin
             %= csrf_field
             %= label_for 'name' => l('Name')
-            %= text_field 'name'
+            %= text_field 'name', class => 'no-autoedit'
             %= label_for 'pwd' => l('Password')
             %= password_field 'pwd'
             %= submit_button l('Login'), class => 'button-primary'
@@ -56,7 +56,7 @@
         %= form_for register => begin
             %= csrf_field
             %= label_for 'name' => l('Name')
-            %= text_field 'name' => flash('prev_registration_name')
+            %= text_field 'name' => flash('prev_registration_name'), class => 'no-autoedit'
             % if ( my $e = $registration_errors->{'name'} ) {
                 <p id="error-name" class="error">
                     %= l("Name must be at least $V::V_MIN_NAME characters.") if $e->[0] eq 'min'
