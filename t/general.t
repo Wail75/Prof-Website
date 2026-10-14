@@ -55,23 +55,34 @@ my $author_page = '/author';
 # Add a new quiz
 my $add_quiz_page = "$author_page/add-quiz";
 
+# Rename a quiz
+my $update_quiz_name_page = "$author_page/update-quiz-name";
+
+# Delete a quiz
+my $delete_quiz_page = "$author_page/delete-quiz";
+
 # Add a new item to a quiz
 my $add_item_page = "$author_page/add-new-item-to-quiz";
+
+# Update an item
+my $update_item_page = "$author_page/update-item";
 
 # respond to a question
 my $respond_page = "/respond-question";
 
 my $name = 'wailtest3';
 my $pwd  = 'liaw12345';
-my ($quiz1_name, $quiz2_name) = ('Test quiz été', 'Autumn');
+my ($quiz1_name, $quiz2_name, $quiz3_name, $quiz4_name) = ('Test quiz été', 'Autumn', '0', '1');
 
 my ($question1, $answer1) = ('Quèsaco?',                          'τίποτα');
 my ($question2, $answer2) = ('Bonjour?',                          'Bonjour!');
 my ($question3, $answer3) = ('What does it have in its pockets?', 'Birthday present');
+my ($question4, $answer4) = ('1 - 1',                             '0');
+my ($question5, $answer5) = ('1 + 1',                             '2');
 
 # to be found in web page
-my ($quiz1_id, $quiz2_id);
-my ($item1_id, $item2_id, $item3_id);
+my ($quiz1_id, $quiz2_id, $quiz3_id, $quiz4_id);
+my ($item1_id, $item2_id, $item3_id, $item4_id);
 
 # get a CSRF token from a page
 sub csrf {
@@ -273,6 +284,134 @@ subtest 'Adding a second quiz' => sub {
     ->text_like('form#do-quiz-select option'   => qr/$quiz2_name \(0%\)/)
     ->text_is('div#do-quiz p#question-asked span' => $question3, 'question from new quiz');
 
+
+  $t->get_ok($logout_page)->status_is(200);
+};
+
+subtest 'Questions and answers edge cases' => sub {
+
+  $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})
+    ->status_is(200)
+    ->text_like('b' => qr/Login successful/);
+
+  $t->post_ok(
+    $add_item_page => form => {
+      csrf($author_page),
+      new_question => $question4,
+      new_answer   => $answer4,
+      quiz_id      => $quiz2_id,
+      quiz_name    => $quiz2_name
+    }
+  )->status_is(200)->text_like('b#notif-ok' => qr/Item created/);
+
+  # get the new item id
+  $t->get_ok($author_page)
+    ->status_is(200)
+    ->element_exists("input[name=updated_question][value=$question4]", 'author page has the new question')
+    ->element_exists("input[name=updated_answer][value=$answer4]",     'author page has the new answer');
+
+  my $input_id = $t->tx->res->dom->at("input[name=updated_question][value=$question4]")->attr('id');
+  like($input_id, qr/question-item-id-.*/, 'spotted the new item id');
+  $input_id =~ /question-item-id-(.*)/;
+  $item4_id = $1;
+  ok($item4_id, 'got the new item id');
+
+  $t->get_ok(
+    $respond_page => form => {
+      csrf($dashboard_page),
+      page_source => 'dashboard',
+      quiz_type   => 'whole-quiz',
+      item_id     => $item4_id,
+      response    => $answer4
+    }
+  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+
+  # change the question and answer and respond again
+  $t->post_ok(
+    $update_item_page => form => {
+      csrf($author_page),
+      item_to_update   => $item4_id,
+      old_question     => $question4,
+      old_answer       => $answer4,
+      updated_question => $question5,
+      updated_answer   => $answer5
+    }
+    )
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/Item question and answer changed/)
+    ->element_exists("input[name=updated_question][value=$question5]", 'author page has the updated question')
+    ->element_exists("input[name=updated_answer][value=$answer5]",     'author page has the updated answer');
+
+  $t->get_ok(
+    $respond_page => form => {
+      csrf($dashboard_page),
+      page_source => 'dashboard',
+      quiz_type   => 'whole-quiz',
+      item_id     => $item4_id,
+      response    => $answer5
+    }
+  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+
+  # change back to the original and answer again
+  $t->post_ok(
+    $update_item_page => form => {
+      csrf($author_page),
+      item_to_update   => $item4_id,
+      old_question     => $question5,
+      old_answer       => $answer5,
+      updated_question => $question4,
+      updated_answer   => $answer4
+    }
+    )
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/Item question and answer changed/)
+    ->element_exists("input[name=updated_question][value=$question4]", 'author page has the original question')
+    ->element_exists("input[name=updated_answer][value=$answer4]",     'author page has the original answer');
+
+  $t->get_ok(
+    $respond_page => form => {
+      csrf($dashboard_page),
+      page_source => 'dashboard',
+      quiz_type   => 'whole-quiz',
+      item_id     => $item4_id,
+      response    => $answer4
+    }
+  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+
+  $t->get_ok($logout_page)->status_is(200);
+};
+
+subtest 'Quiz name edge cases' => sub {
+  $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})
+    ->status_is(200)
+    ->text_like('b' => qr/Login successful/);
+
+  $t->post_ok($add_quiz_page => form => {csrf($author_page), new_quiz_name => $quiz3_name})
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/Quiz created/)
+    ->text_is('h4' => $quiz3_name);
+
+  $quiz3_id = $t->tx->res->dom->at("div#quiz-$quiz3_name input[name=quiz_id]")->attr('value');
+  ok($quiz3_id, 'got the edge case quiz id');
+
+  $t->post_ok($update_quiz_name_page => form =>
+      {csrf($author_page), quiz_name_to_update => $quiz3_name, new_quiz_name => $quiz4_name})
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/Quiz name changed/)
+    ->text_is('h4' => $quiz4_name)
+    ->text_isnt('h4' => $quiz3_name);
+
+  $t->post_ok($update_quiz_name_page => form =>
+      {csrf($author_page), quiz_name_to_update => $quiz4_name, new_quiz_name => $quiz3_name})
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/Quiz name changed/)
+    ->text_is('h4' => $quiz3_name)
+    ->text_isnt('h4' => $quiz4_name);
+
+  $t->post_ok($delete_quiz_page => form => {csrf($author_page), quiz_name_to_delete => $quiz3_name})
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/Quiz deleted/)
+    ->text_isnt('h4' => $quiz3_name);
 
   $t->get_ok($logout_page)->status_is(200);
 };

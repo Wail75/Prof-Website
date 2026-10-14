@@ -2,7 +2,7 @@
 %# required to show correct answers $last_response_quiz_type
 %# expects flash or session variable 'response_msg' to show if the response to quiz is correct or not
 
-% if ($single_item_id && $single_question) {
+% if ($single_item_id && defined $single_question) {
 
 %# <h3 id="quiz-name"><%=l('Quiz: ') . $selected_quiz_name%></h3>
 

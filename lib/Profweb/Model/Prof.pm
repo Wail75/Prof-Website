@@ -382,8 +382,10 @@ sub basic_answer_compare {
 sub respond_question {
   my ($self, $user_id, $item_id, $response) = @_;
 
-  return (status => 0, msg => 'Parameter missing: item_id')  unless $item_id;
-  return (status => 0, msg => 'Parameter missing: response') unless $response;
+  return (status => 0, msg => 'Parameter missing: item_id') unless $item_id;
+
+  # '0' or '' might be an answer
+  return (status => 0, msg => 'Parameter missing: response') unless defined $response;
 
   my $query_answer = 'SELECT answer FROM items WHERE id = $1';
   my $query_result = <<'EOS';
@@ -1097,7 +1099,7 @@ EOS
   }
   my ($answer, $item_id, $quiz_id) = @{$res->array};
 
-  if (!$answer) {
+  if (!defined $answer) {
     return (status => 0, msg => "Could not find the answer for session id '$session_id'.");
   }
   my $grade = $answer eq $response ? $MAX_GRADE : 0;
