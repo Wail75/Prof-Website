@@ -37,7 +37,8 @@ my $register_page = '/register';
 my $verify_email_page = '/verify-email';
 
 # link to confirm an email address
-my $verif_link_regex = qr!link http.*($verify_email_page.*jwt=.*)\.!;
+my $verif_link_regex    = qr!link http.*($verify_email_page.*jwt=.*)\.!;
+my $verif_link_regex_fr = qr!lien http.*($verify_email_page.*jwt=.*)\.!;
 
 # a page containing a form to login
 my $login_form = '/';
@@ -75,20 +76,22 @@ my $profiles = '/profiles';
 my $wrong_login_err_msg   = "Wrong user name or password";
 my $missing_login_err_msg = "must give a user name and a password";
 
-my $name            = 'wailtest3';
+my $name            = 'wailtest1';
 my $invalid_pwd     = '123';
 my $pwd             = 'liaw12345';
 my $desc            = 'Just a user of this wonderful tool.';
 my $pwd2            = 'uah45dfi*';
 my $pwd_too_short   = 'l';
 my $email           = 'test@test.org';
-my $name2           = 'wailtest4';
+my $name2           = 'wailtest2';
 my $name_too_long   = 'n' x ($V::V_MAX_NAME + 1);
 my $email_too_short = 'e';
 my $email_too_long  = 'e' x ($V::V_MAX_EMAIL + 1);
 my $email_invalid   = 'truchahapasdearrobase';
 my $email2          = 'test2@test.org';
 my $email3          = 'test3@test.org';
+my $email4          = 'test4@test.org';
+my $email5          = 'test5@test.org';
 my $unknown_email   = 'skjdfs@lskjdfd.dkj';
 
 # this id should not work with a new test because it contains a timestamp from the past
@@ -514,6 +517,45 @@ subtest 'Pages translated in French' => sub {
     ->status_is(200)
     ->text_like('b#notif-error' => qr/L'inscription a échoué/)
     ->text_like('p#error-pwd1'  => qr/mot de passe doit faire au moins/);
+
+  # test translation in emails
+  $t->post_ok($register_page => {'Accept-Language' => 'fr'} => form =>
+      {csrf($register_form), email => $email4, pwd1 => $pwd, pwd2 => $pwd})->status_is(200);
+  like($last_email_args{text}, qr/Si vous n'avez pas essayé/, 'translation in email');
+  like($last_email_args{text}, qr/Bonjour/,                   'translation subject in email');
+  like(
+    $last_email_args{text},
+    qr/Vous venez de créer un compte utilisateur avec cette adresse email/,
+    'translation in email address confirmation email'
+  );
+  unlike($last_email_args{text}, qr/&#?\w+;/, 'no HTML entity in email address confirmation email');
+
+  # run the email verification link
+  $last_email_args{text} =~ $verif_link_regex_fr;
+  my $email_verify_path = $1;
+  $t->get_ok($email_verify_path)
+    ->status_is(200)
+    ->text_like('b#notif-ok' => qr/email address has been successfully verified/);
+
+  $t->post_ok($ask_email_change => {'Accept-Language' => 'fr'} => form => {csrf($account_page), 'new-email' => $email5})
+    ->status_is(200);
+  like(
+    $last_email_args{text},
+    qr/Vous venez de demander de changer l'adresse email/,
+    'translation in email change email'
+  );
+  unlike($last_email_args{text}, qr/&#?\w+;/, 'no HTML entity in email change email');
+
+  $t->get_ok($logout_page)->status_is(200);
+
+  $t->post_ok($recover_password => {'Accept-Language' => 'fr'} => form => {csrf($recover_password), email => $email3})
+    ->status_is(200);
+  like(
+    $last_email_args{text},
+    qr/Pour redéfinir le mot de passe de votre compte, veuillez cliquer sur ce lien/,
+    'translation in reset password email'
+  );
+  unlike($last_email_args{text}, qr/&#?\w+;/, 'no HTML entity in reset password email');
 };
 
 subtest 'Authorization checks' => sub {

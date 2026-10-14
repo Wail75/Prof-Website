@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Controller';
 use V;
 use Mojo::JWT;
 
-my $email_topic = 'Profweb Website';
+my $email_topic = 'Prof Website';
 
 sub log_context {
   my ($c, $method_name) = @_;

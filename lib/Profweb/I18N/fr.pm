@@ -5,11 +5,11 @@ use Mojo::Base 'Profweb::I18N';
 use V;
 
 our %Lexicon = (
-  'Prof!'                       => 'Prof!',
-  'Prof'                        => 'Prof',
-  'Hello from Profweb Website.' => "Bonjour, du site web Prof,",
-  'The Profweb Website team'    => "L'équipe du site web Prof",
-  'Profweb Website'             => "Site Web Prof",
+  'Prof!'                    => 'Prof!',
+  'Prof'                     => 'Prof',
+  'Hello from Prof Website,' => "Bonjour, de la part du site web Prof,",
+  'The Prof Website team'    => "L'équipe du site web Prof",
+  'Prof Website'             => "Site Web Prof",
 
   'Learn and memorize by creating your quizzes and playing them.' =>
     'Apprenez et mémorisez en créant vos quizs et en les jouant.',
@@ -187,6 +187,11 @@ our %Lexicon = (
 
   'Recover your password'   => "Récupérez votre mot de passe",
   'Recover password failed' => "La récupérationd du mot de passse a échoué.",
+
+  'You have just registered an account for this email address.' =>
+    "Vous venez de créer un compte utilisateur avec cette adresse email.",
+  'If you have not tried to register to the Prof Website, please tell us.' =>
+    "Si vous n'avez pas essayé de vous inscrire au site web Prof, merci de nous en avertir.",
 
   'You have just asked to change your account email address.' =>
     "Vous venez de demander de changer l'adresse email de votre compte.",
