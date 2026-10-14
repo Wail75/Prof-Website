@@ -1,3 +1,10 @@
+1.04  2026-10-14
+  - make response textarea full width instead of fixed columns size to avoid horizontal scrolling on narrow screens
+  - prevent auto editing by browsers
+  - fix a wrong project name
+  - fix emails texts, adding translation
+  - fix some quiz/question/answer name edge cases, especially '0'
+
 1.03  2026-10-05
   - remove a directive that seemed to have only caused navigation errors
   - redirect to Dashboard after registering
