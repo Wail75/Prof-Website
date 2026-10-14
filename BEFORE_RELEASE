@@ -7,3 +7,4 @@
 - git commit and push
 - merge to master, switch to master and pull
 - git tag and push
+- create a branch next_release_vX.XX
