@@ -11,7 +11,7 @@
 
 %= include 'common/_notifications'
 
-% if ($single_item_id && $single_question) {
+% if ($single_item_id && defined $single_question) {
     <div id="single-question" class="row bloc">
       <h2 id="single-question"><%=l('Single Question')%></h2>
       %= include 'common/_single_question'

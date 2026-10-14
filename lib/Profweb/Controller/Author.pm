@@ -74,23 +74,33 @@ sub add_quiz {
 }
 
 sub update_quiz_name {
-  my $c              = shift;
-  my $quiz_to_update = $c->param('quiz_name_to_update') || '';
-  my $new_quiz_name  = $c->param('new_quiz_name')       || '';
-  my %hres           = $c->prof->rename_quiz($c->session('id'), $quiz_to_update, $new_quiz_name);
+  my $c = shift;
 
+  # quiz name might be '0'
+  my $quiz_to_update = $c->param('quiz_name_to_update') // '';
+  my $new_quiz_name  = $c->param('new_quiz_name')       // '';
+
+  my $log = $c->log_context("update_quiz_name '$quiz_to_update'");
+  $log->info("start.");
+
+  my %hres = $c->prof->rename_quiz($c->session('id'), $quiz_to_update, $new_quiz_name);
   if ($hres{status}) {
     $c->flash(message => 'Quiz name changed.');
   }
   else {
+    $log->warn("failed: '$hres{msg}'.");
     $c->flash(error => 'Quiz name change failed.');
   }
+
+  $log->info("done.");
   $c->redirect_to('author_index');
 }
 
 sub delete_quiz {
-  my $c         = shift;
-  my $quiz_name = $c->param('quiz_name_to_delete') || '';
+  my $c = shift;
+
+  # quiz name might be '0'
+  my $quiz_name = $c->param('quiz_name_to_delete') // '';
   my %hres      = $c->prof->delete_quiz($c->session('id'), $quiz_name);
 
   if ($hres{status}) {
@@ -103,9 +113,11 @@ sub delete_quiz {
 }
 
 sub create_item {
-  my $c        = shift;
-  my $question = $c->param('new_question') || '';
-  my $answer   = $c->param('new_answer')   || '';
+  my $c = shift;
+
+  # item question or answer might be '0'
+  my $question = $c->param('new_question') // '';
+  my $answer   = $c->param('new_answer')   // '';
   my %hres     = $c->prof->create_item($c->session('id'), $question, $answer);
 
   if ($hres{status}) {
@@ -133,11 +145,11 @@ sub delete_item {
 
 sub update_item {
   my $c            = shift;
-  my $item_id      = $c->param('item_to_update')   || '';
-  my $old_question = $c->param('old_question')     || '';
-  my $old_answer   = $c->param('old_answer')       || '';
-  my $question     = $c->param('updated_question') || '';
-  my $answer       = $c->param('updated_answer')   || '';
+  my $item_id      = $c->param('item_to_update') || '';
+  my $old_question = $c->param('old_question')     // '';
+  my $old_answer   = $c->param('old_answer')       // '';
+  my $question     = $c->param('updated_question') // '';
+  my $answer       = $c->param('updated_answer')   // '';
 
   my ($que_ok, $que_ko, $ans_ok, $ans_ko);
   if ($old_question ne $question) {

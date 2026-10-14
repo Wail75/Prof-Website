@@ -74,7 +74,7 @@
                 %= label_for 'updated_question' => begin
                     <%=l('Question')%>
                 % end
-                %= text_field updated_question => $item->{question}, class => 'u-full-width'
+                %= text_field updated_question => $item->{question}, class => 'u-full-width', id => "question-item-id-$item->{id}"
         </div>
         <div class="four columns">
                 %= label_for 'updated_answer' => begin
