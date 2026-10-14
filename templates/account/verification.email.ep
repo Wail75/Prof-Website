@@ -1,8 +1,8 @@
-Hello from Prof Website.
+<%==l('Hello from Prof Website,')%>
 
-You have just registered an account for this email address.
-Please confirm that you received this email by visiting this link <%= $url %> .
+<%==l('You have just registered an account for this email address.')%>
+<%==l('Please confirm that you received this email by visiting this link')%> <%== $url %> .
 
-If you have not tried to register to the Prof Website, please tell us.
+<%==l('If you have not tried to register to the Prof Website, please tell us.')%>
 
-The Prof Website team
+<%==l('The Prof Website team')%>
