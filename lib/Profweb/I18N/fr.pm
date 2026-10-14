@@ -25,7 +25,7 @@ our %Lexicon = (
   'You can connect to your dashboard and this website will automatically choose a question for you, preferably a question that you have not answered yet or one where you made more mistakes.'
     => "Vous pouvez vous connecter à votre tableau de bord et ce site web choisira automatiquement une question pour vous, en préférant les questions auxquelles vous n'avez pas encore répondu ou celles auxquelles vous avez fait le plus d'erreur.",
   "More features will come later, don't hesitate to give me some feedback." =>
-    "De nouvelles fonctionnalités arriveront plus tard, n'hésitez pas à nous faire des retours.",
+    "De nouvelles fonctionnalités arriveront plus tard, n'hésitez pas à me faire des retours.",
   'I am actively using this website to help me learn!' =>
     "J'utilise ce site web régulièrement pour m'aider à apprendre!",
   'Open source'                                   => "Logiciel libre",
