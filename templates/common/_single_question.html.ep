@@ -6,7 +6,8 @@
 
 %# <h3 id="quiz-name"><%=l('Quiz: ') . $selected_quiz_name%></h3>
 
-    % if ($last_response_quiz_type && $last_response_quiz_type eq 'single-question') {
+    % my $return_single_question = $last_response_quiz_type && $last_response_quiz_type eq 'single-question';
+    % if ($return_single_question) {
       %= include 'common/_response_result'
     % }
 
@@ -26,7 +27,7 @@
     %= hidden_field quiz_type => 'single-question'
     %= hidden_field item_id => $single_item_id
     %# 33 cols is adjusted for mobile
-    %= text_area 'response', rows => 3, class => 'large-text u-full-width no-autoedit', autofocus => ''
+    %= text_area 'response', rows => 3, class => 'large-text u-full-width no-autoedit', ( $return_single_question ? (autofocus => '') : () )
     %= submit_button l('Send')
 %= end
 </p>
