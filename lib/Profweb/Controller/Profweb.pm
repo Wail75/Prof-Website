@@ -3,7 +3,7 @@ package Profweb::Controller::Profweb;
 use Mojo::Base 'Mojolicious::Controller';
 
 # if returning from an endpoint that may be called from different pages
-my $DEFAULT_RETURN_PAGE = 'dashboard';
+my $DEFAULT_PAGE_SOURCE = 'dashboard';
 
 sub log_context {
   my ($c, $method_name) = @_;
@@ -75,8 +75,8 @@ sub dashboard {
   }
   $log->info("done.");
 
+  $c->session(page_source => 'dashboard');
   return $c->render(
-    page_source                 => $c->url_for,
     last_response_quiz_type     => $c->session('last_response_quiz_type') || '',
     selected_quiz_name          => $selected_quiz_name,
     selected_quiz_average_grade => $selected_quiz_average_grade,
@@ -120,8 +120,8 @@ sub do_quizs {
     $log->info("done.");
   }
 
+  $c->session(page_source => $c->url_for);
   return $c->render(
-    page_source                 => $c->url_for,
     last_response_quiz_type     => $c->session('last_response_quiz_type') || '',
     quizs                       => $quizs,
     selected_quiz_name          => $selected_quiz_name,
@@ -133,6 +133,7 @@ sub do_quizs {
   );
 }
 
+# Parameters:
 sub respond_question {
   my $c = shift;
   my $err;
@@ -141,9 +142,8 @@ sub respond_question {
 
   # the param 'response' might be any string (empty, with leading spaces etc)
   $v->csrf_protect()
-    ->required('page_source', 'trim', 'not_empty')
-    ->required('quiz_type',   'trim', 'not_empty')
-    ->required('item_id',     'trim', 'not_empty')
+    ->required('quiz_type', 'trim', 'not_empty')
+    ->required('item_id',   'trim', 'not_empty')
     ->required('response');
 
   if ($v->has_error('csrf_token')) {
@@ -152,8 +152,8 @@ sub respond_question {
   elsif ($v->has_error()) {
     $err = 'Your answer has not been saved.';
   }
-  my $page_source = $c->param('page_source');
-  return $c->flash(error => $err)->redirect_to($page_source || $DEFAULT_RETURN_PAGE) if $err;
+  my $page_source = $c->session('page_source') || $DEFAULT_PAGE_SOURCE;
+  return $c->flash(error => $err)->redirect_to($page_source) if $err;
 
   my $user_id   = $c->session('id') || '';
   my $quiz_type = $c->param('quiz_type');

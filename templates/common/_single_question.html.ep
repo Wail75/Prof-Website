@@ -1,4 +1,4 @@
-%# required variables: $page_source $single_quiz_name $single_item_id $single_question
+%# required variables: $single_quiz_name $single_item_id $single_question
 %# required to show correct answers $last_response_quiz_type
 %# expects flash or session variable 'response_msg' to show if the response to quiz is correct or not
 
@@ -23,7 +23,6 @@
 <p>
 %= form_for 'respond_question' => begin
     %= csrf_field
-    %= hidden_field page_source => $page_source
     %= hidden_field quiz_type => 'single-question'
     %= hidden_field item_id => $single_item_id
     %# 33 cols is adjusted for mobile

@@ -6,7 +6,6 @@ use open qw(:std :encoding(UTF-8));
 use Mojo::Base -strict;
 use Test::More;
 use Test::Mojo;
-use V;
 
 use Mojolicious::Plugin::Config;
 
@@ -21,7 +20,8 @@ my $t           = Test::Mojo->new('Profweb', $test_config);
 # use a test database, recreate it each time
 $t->app->pg->migrations->migrate(0)->migrate();
 
-$t->ua->max_redirects(3);
+my $MAX_REDIRECTS = 3;
+$t->ua->max_redirects($MAX_REDIRECTS);
 
 ### Map of the site for testing
 
@@ -33,9 +33,6 @@ my $register_page = '/register';
 
 # verify an email
 my $verify_email_page = '/verify_email';
-
-# link to confirm an email address
-my $verif_link_regex = qr!link http.*($verify_email_page.*jwt=.*)\.!;
 
 # a page containing a form to login
 my $login_form = '/';
@@ -82,6 +79,7 @@ my ($question5, $answer5) = ('1 + 1',                             '2');
 
 # to be found in web page
 my ($quiz1_id, $quiz2_id, $quiz3_id, $quiz4_id);
+my $quiz2_link;
 my ($item1_id, $item2_id, $item3_id, $item4_id);
 
 # get a CSRF token from a page
@@ -162,15 +160,10 @@ subtest 'Respond to a whole quiz' => sub {
 
   $item1_id = $t->tx->res->dom->at('div#single-question input[name=item_id]')->attr('value');
 
-  $t->get_ok(
-    $respond_page => form => {
-      csrf($dashboard_page),
-      page_source => 'dashboard',
-      quiz_type   => 'whole-quiz',
-      item_id     => $item1_id,
-      response    => $answer1
-    }
-  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+  $t->get_ok($respond_page => form =>
+      {csrf($dashboard_page), quiz_type => 'whole-quiz', item_id => $item1_id, response => $answer1})
+    ->status_is(200)
+    ->text_like('p#response-result' => qr/Good answer/);
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
@@ -178,15 +171,10 @@ subtest 'Respond to a whole quiz' => sub {
     ->text_like('div#do-quiz p#question-asked' => qr/your average score: 100%/)
     ->text_like('form#do-quiz-select option'   => qr/$quiz1_name \(100%\)/, '100% grade after first good response');
 
-  $t->get_ok(
-    $respond_page => form => {
-      csrf($dashboard_page),
-      page_source => 'dashboard',
-      quiz_type   => 'whole-quiz',
-      item_id     => $item1_id,
-      response    => "x$answer1"
-    }
-  )->status_is(200)->text_like('p#response-result' => qr/Wrong answer/);
+  $t->get_ok($respond_page => form =>
+      {csrf($dashboard_page), quiz_type => 'whole-quiz', item_id => $item1_id, response => "x$answer1"})
+    ->status_is(200)
+    ->text_like('p#response-result' => qr/Wrong answer/);
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
@@ -213,15 +201,10 @@ subtest 'Respond to a whole quiz' => sub {
   $item2_id = $t->tx->res->dom->at('div#single-question input[name=item_id]')->attr('value');
 
   # answer correctly two times the new question then the Single Question will be the previous question
-  $t->get_ok(
-    $respond_page => form => {
-      csrf($dashboard_page),
-      page_source => 'dashboard',
-      quiz_type   => 'single-question',
-      item_id     => $item2_id,
-      response    => $answer2
-    }
-  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+  $t->get_ok($respond_page => form =>
+      {csrf($dashboard_page), quiz_type => 'single-question', item_id => $item2_id, response => $answer2})
+    ->status_is(200)
+    ->text_like('p#response-result' => qr/Good answer/);
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
@@ -232,15 +215,10 @@ subtest 'Respond to a whole quiz' => sub {
     ->text_like('div#do-quiz p#question-asked' => qr/your average score: 100%/)
     ->text_like('form#do-quiz-select option'   => qr/$quiz1_name \(67%\)/);
 
-  $t->get_ok(
-    $respond_page => form => {
-      csrf($dashboard_page),
-      page_source => 'dashboard',
-      quiz_type   => 'single-question',
-      item_id     => $item2_id,
-      response    => $answer2
-    }
-  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+  $t->get_ok($respond_page => form =>
+      {csrf($dashboard_page), quiz_type => 'single-question', item_id => $item2_id, response => $answer2})
+    ->status_is(200)
+    ->text_like('p#response-result' => qr/Good answer/);
 
   $t->get_ok($dashboard_page)
     ->status_is(200)
@@ -284,6 +262,7 @@ subtest 'Adding a second quiz' => sub {
     ->text_like('form#do-quiz-select option'   => qr/$quiz2_name \(0%\)/)
     ->text_is('div#do-quiz p#question-asked span' => $question3, 'question from new quiz');
 
+  $item3_id = $t->tx->res->dom->at('div#single-question input[name=item_id]')->attr('value');
 
   $t->get_ok($logout_page)->status_is(200);
 };
@@ -316,15 +295,10 @@ subtest 'Questions and answers edge cases' => sub {
   $item4_id = $1;
   ok($item4_id, 'got the new item id');
 
-  $t->get_ok(
-    $respond_page => form => {
-      csrf($dashboard_page),
-      page_source => 'dashboard',
-      quiz_type   => 'whole-quiz',
-      item_id     => $item4_id,
-      response    => $answer4
-    }
-  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+  $t->get_ok($respond_page => form =>
+      {csrf($dashboard_page), quiz_type => 'whole-quiz', item_id => $item4_id, response => $answer4})
+    ->status_is(200)
+    ->text_like('p#response-result' => qr/Good answer/);
 
   # change the question and answer and respond again
   $t->post_ok(
@@ -342,15 +316,10 @@ subtest 'Questions and answers edge cases' => sub {
     ->element_exists("input[name=updated_question][value=$question5]", 'author page has the updated question')
     ->element_exists("input[name=updated_answer][value=$answer5]",     'author page has the updated answer');
 
-  $t->get_ok(
-    $respond_page => form => {
-      csrf($dashboard_page),
-      page_source => 'dashboard',
-      quiz_type   => 'whole-quiz',
-      item_id     => $item4_id,
-      response    => $answer5
-    }
-  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+  $t->get_ok($respond_page => form =>
+      {csrf($dashboard_page), quiz_type => 'whole-quiz', item_id => $item4_id, response => $answer5})
+    ->status_is(200)
+    ->text_like('p#response-result' => qr/Good answer/);
 
   # change back to the original and answer again
   $t->post_ok(
@@ -368,15 +337,10 @@ subtest 'Questions and answers edge cases' => sub {
     ->element_exists("input[name=updated_question][value=$question4]", 'author page has the original question')
     ->element_exists("input[name=updated_answer][value=$answer4]",     'author page has the original answer');
 
-  $t->get_ok(
-    $respond_page => form => {
-      csrf($dashboard_page),
-      page_source => 'dashboard',
-      quiz_type   => 'whole-quiz',
-      item_id     => $item4_id,
-      response    => $answer4
-    }
-  )->status_is(200)->text_like('p#response-result' => qr/Good answer/);
+  $t->get_ok($respond_page => form =>
+      {csrf($dashboard_page), quiz_type => 'whole-quiz', item_id => $item4_id, response => $answer4})
+    ->status_is(200)
+    ->text_like('p#response-result' => qr/Good answer/);
 
   $t->get_ok($logout_page)->status_is(200);
 };
@@ -412,6 +376,50 @@ subtest 'Quiz name edge cases' => sub {
     ->status_is(200)
     ->text_like('b#notif-ok' => qr/Quiz deleted/)
     ->text_isnt('h4' => $quiz3_name);
+
+  $t->get_ok($logout_page)->status_is(200);
+};
+
+subtest 'Direct quiz page' => sub {
+  $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})
+    ->status_is(200)
+    ->text_like('b' => qr/Login successful/);
+
+  $t->get_ok($author_page)->status_is(200)->text_is("p#link_do_quiz_$quiz2_id a" => 'Direct link to this quiz.');
+
+  $quiz2_link = $t->tx->res->dom->at("p#link_do_quiz_$quiz2_id a")->attr('href');
+  like($quiz2_link => qr!quizs/\w+!, 'got the direct link to quiz');
+
+  $t->get_ok($logout_page)->status_is(200);
+};
+
+subtest 'Redirection after respond question' => sub {
+
+  my $location_like = sub {
+    my ($t, $value, $desc) = @_;
+    $desc ||= "Location: $value";
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return $t->success(like($t->tx->res->headers->location, $value, $desc));
+  };
+
+  $t->post_ok($login_page => form => {csrf($login_form), name => $name, pwd => $pwd})
+    ->status_is(200)
+    ->text_like('b' => qr/Login successful/);
+
+  # obviously no redirect for these specific tests
+  $t->ua->max_redirects(0);
+
+  $t->get_ok($respond_page => form =>
+      {csrf($dashboard_page), quiz_type => 'whole-quiz', item_id => $item1_id, response => $answer1})
+    ->status_is(302)
+    ->$location_like(qr!/dashboard!, 'respond after dashboard redirects to dashboard');
+
+  $t->get_ok(
+    $respond_page => form => {csrf($quiz2_link), quiz_type => 'whole-quiz', item_id => $item3_id, response => $answer3})
+    ->status_is(302)
+    ->$location_like(qr!/quizs/[-\w]+/$quiz2_id!, 'respond after dashboard redirects to quiz page');
+
+  $t->ua->max_redirects($MAX_REDIRECTS);
 
   $t->get_ok($logout_page)->status_is(200);
 };
